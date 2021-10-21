@@ -1,0 +1,6 @@
+domain: stenic.io
+layout:
+- go.kubebuilder.io/v3
+projectName: sql-operator
+repo: github.com/stenic/sql-operator
+version: "3"
