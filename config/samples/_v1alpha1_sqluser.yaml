@@ -1,0 +1,10 @@
+apiVersion: stenic.io/v1alpha1
+kind: SqlUser
+metadata:
+  name: sqluser-sample123
+spec:
+  credentials:
+    username: sqloperator
+    password: sqloperator123
+  hostRef:
+    name: sqlhost-sample

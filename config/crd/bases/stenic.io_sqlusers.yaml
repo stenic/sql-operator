@@ -1,0 +1,82 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: sqlusers.stenic.io
+spec:
+  group: stenic.io
+  names:
+    kind: SqlUser
+    listKind: SqlUserList
+    plural: sqlusers
+    singular: sqluser
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SqlUser is the Schema for the sqlusers API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SqlUserSpec defines the desired state of SqlUser
+            properties:
+              credentials:
+                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                  Important: Run "make" to regenerate code after modifying this file'
+                properties:
+                  password:
+                    type: string
+                  username:
+                    type: string
+                type: object
+              hostRef:
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                type: object
+            required:
+            - hostRef
+            type: object
+          status:
+            description: SqlUserStatus defines the observed state of SqlUser
+            properties:
+              created:
+                type: boolean
+              creationTimestamp:
+                format: date-time
+                type: string
+              lastModifiedTimestamp:
+                format: date-time
+                type: string
+            required:
+            - created
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

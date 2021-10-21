@@ -1,0 +1,6 @@
+apiVersion: stenic.io/v1alpha1
+kind: SqlDatabase
+metadata:
+  name: sqldatabase-sample
+spec:
+  

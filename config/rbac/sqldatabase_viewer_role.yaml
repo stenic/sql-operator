@@ -1,0 +1,20 @@
+# permissions for end users to view sqldatabases.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sqldatabase-viewer-role
+rules:
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqldatabases
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqldatabases/status
+  verbs:
+  - get

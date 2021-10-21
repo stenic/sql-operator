@@ -1,0 +1,11 @@
+apiVersion: stenic.io/v1alpha1
+kind: SqlHost
+metadata:
+  name: sqlhost-sample
+spec:
+  endpoint:
+    host: 192.168.23.82
+    port: 3306
+  credentials:
+    username: sqloperator
+    password: sqloperator

@@ -1,0 +1,24 @@
+# permissions for end users to edit sqlhosts.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sqlhost-editor-role
+rules:
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlhosts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlhosts/status
+  verbs:
+  - get

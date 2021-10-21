@@ -1,0 +1,20 @@
+# permissions for end users to view sqlusers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sqluser-viewer-role
+rules:
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlusers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlusers/status
+  verbs:
+  - get

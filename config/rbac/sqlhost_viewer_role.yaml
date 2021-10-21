@@ -1,0 +1,20 @@
+# permissions for end users to view sqlhosts.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sqlhost-viewer-role
+rules:
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlhosts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlhosts/status
+  verbs:
+  - get

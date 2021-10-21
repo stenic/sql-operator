@@ -1,0 +1,24 @@
+# permissions for end users to edit sqldatabases.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sqldatabase-editor-role
+rules:
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqldatabases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqldatabases/status
+  verbs:
+  - get
