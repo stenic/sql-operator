@@ -57,9 +57,15 @@ spec:
                     description: Port to use when connecting to the sql server
                     type: integer
                 type: object
+              engine:
+                description: Engine of the external endpoint (like Mysql)
+                enum:
+                - Mysql
+                type: string
             required:
             - credentials
             - endpoint
+            - engine
             type: object
           status:
             description: SqlHostStatus defines the observed state of SqlHost

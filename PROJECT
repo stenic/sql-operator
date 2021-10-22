@@ -28,4 +28,12 @@ resources:
   kind: SqlHost
   path: github.com/stenic/sql-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: stenic.io
+  kind: SqlGrants
+  path: github.com/stenic/sql-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"

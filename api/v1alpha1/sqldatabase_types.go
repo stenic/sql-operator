@@ -25,17 +25,30 @@ import (
 
 // SqlDatabaseSpec defines the desired state of SqlDatabase
 type SqlDatabaseSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of SqlDatabase. Edit sqldatabase_types.go to remove/update
+	// Reference to the SqlHost
 	HostRef SqlHostRef `json:"hostRef"`
+
+	// Name of the external database
+	DatabaseName string `json:"databaseName"`
+
+	// Specifies how to handle deletion of a SqlUser.
+	// Valid values are:
+	// - "Retain" (default): keeps the external resource when the object is deleted;
+	// - "Delete": deletes the external resource when the object is deleted;
+	// +optional
+	CleanupPolicy CleanupPolicy `json:"cleanupPolicy,omitempty"`
 }
 
 // SqlDatabaseStatus defines the observed state of SqlDatabase
 type SqlDatabaseStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Boolean indicating the creation process has started
+	Created bool `json:"created"`
+
+	// Timestamp when the user was first created.
+	CreationTimestamp *metav1.Time `json:"creationTimestamp,omitempty"`
+
+	// Timestamp when the user was last updated/checked.
+	LastModifiedTimestamp *metav1.Time `json:"lastModifiedTimestamp,omitempty"`
 }
 
 //+kubebuilder:object:root=true

@@ -25,11 +25,11 @@ import (
 
 // SqlUserSpec defines the desired state of SqlUser
 type SqlUserSpec struct {
-	// Credentials to use for creating the user
-	Credentials SqlCredentials `json:"credentials,omitempty"`
-
 	// Reference to the SqlHost
 	HostRef SqlHostRef `json:"hostRef"`
+
+	// Credentials to use for creating the user
+	Credentials SqlCredentials `json:"credentials,omitempty"`
 
 	// Specifies how to handle deletion of a SqlUser.
 	// Valid values are:

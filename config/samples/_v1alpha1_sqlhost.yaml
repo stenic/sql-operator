@@ -3,6 +3,7 @@ kind: SqlHost
 metadata:
   name: sqlhost-sample
 spec:
+  engine: Mysql
   endpoint:
     host: 192.168.23.82
     port: 3306

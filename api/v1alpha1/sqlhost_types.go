@@ -25,8 +25,8 @@ import (
 
 // SqlHostSpec defines the desired state of SqlHost
 type SqlHostSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Engine of the external endpoint (like Mysql)
+	Engine EngineType `json:"engine"`
 
 	// Endpoint to manage
 	Endpoint SqlHostEndpoint `json:"endpoint"`
@@ -34,6 +34,14 @@ type SqlHostSpec struct {
 	// Credentials to use when connecting to the endpoint
 	Credentials SqlCredentials `json:"credentials"`
 }
+
+// +kubebuilder:validation:Enum=Mysql
+type EngineType string
+
+const (
+	// Keep
+	EngineTypeMysql EngineType = "Mysql"
+)
 
 // SqlHostStatus defines the observed state of SqlHost
 type SqlHostStatus struct {
