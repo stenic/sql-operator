@@ -41,16 +41,10 @@ type SqlUserReconciler struct {
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlusers,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlusers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlusers/finalizers,verbs=update
+//+kubebuilder:rbac:groups=stenic.io,resources=sqlhosts,verbs=get;list;watch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the SqlUser object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
@@ -61,13 +55,14 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	finalizerName := "stenic.io/sqluser-deletion"
+	hostNamespacedName := r.getHostNamespacedName(user)
 
 	// examine DeletionTimestamp to determine if object is under deletion
 	if user.ObjectMeta.DeletionTimestamp.IsZero() {
 		// The object is not being deleted, so if it does not have our finalizer,
 		// then lets add the finalizer and update the object. This is equivalent
 		// registering our finalizer.
-		if !containsString(user.GetFinalizers(), finalizerName) {
+		if !controllerutil.ContainsFinalizer(&user, finalizerName) {
 			controllerutil.AddFinalizer(&user, finalizerName)
 			if err := r.Update(ctx, &user); err != nil {
 				return ctrl.Result{}, err
@@ -75,9 +70,8 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	} else {
 		// The object is being deleted
-		if containsString(user.GetFinalizers(), finalizerName) {
+		if controllerutil.ContainsFinalizer(&user, finalizerName) {
 			// our finalizer is present, so lets handle any external dependency
-			hostNamespacedName := r.getHostNamespacedName(user)
 			var host steniciov1alpha1.SqlHost
 			if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
 				log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
@@ -100,7 +94,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 
-	hostNamespacedName := r.getHostNamespacedName(user)
+	// Lookup the referenced host
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
 		log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
@@ -129,27 +123,8 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
-}
-
-// Helper functions to check and remove string from a slice of strings.
-func containsString(slice []string, s string) bool {
-	for _, item := range slice {
-		if item == s {
-			return true
-		}
-	}
-	return false
-}
-
-func removeString(slice []string, s string) (result []string) {
-	for _, item := range slice {
-		if item == s {
-			continue
-		}
-		result = append(result, item)
-	}
-	return
+	return ctrl.Result{}, nil
+	// return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 }
 
 func (r *SqlUserReconciler) createExternalResource(ctx context.Context, user steniciov1alpha1.SqlUser, host steniciov1alpha1.SqlHost) error {

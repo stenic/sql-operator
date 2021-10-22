@@ -28,8 +28,11 @@ type SqlHostSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	Endpoint    SqlHostEndpoint `json:"endpoint"`
-	Credentials SqlCredentials  `json:"credentials"`
+	// Endpoint to manage
+	Endpoint SqlHostEndpoint `json:"endpoint"`
+
+	// Credentials to use when connecting to the endpoint
+	Credentials SqlCredentials `json:"credentials"`
 }
 
 // SqlHostStatus defines the observed state of SqlHost

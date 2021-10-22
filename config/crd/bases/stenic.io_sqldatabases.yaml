@@ -41,8 +41,10 @@ spec:
                   to remove/update
                 properties:
                   name:
+                    description: Name of the SqlHost
                     type: string
                   namespace:
+                    description: Namespace of the SqlHost
                     type: string
                 type: object
             required:

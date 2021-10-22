@@ -37,19 +37,23 @@ spec:
             description: SqlUserSpec defines the desired state of SqlUser
             properties:
               credentials:
-                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-                  Important: Run "make" to regenerate code after modifying this file'
+                description: Credentials to use for creating the user
                 properties:
                   password:
+                    description: Password for the sql user
                     type: string
                   username:
+                    description: Username for the sql user
                     type: string
                 type: object
               hostRef:
+                description: Reference to the SqlHost
                 properties:
                   name:
+                    description: Name of the SqlHost
                     type: string
                   namespace:
+                    description: Namespace of the SqlHost
                     type: string
                 type: object
             required:
@@ -59,11 +63,14 @@ spec:
             description: SqlUserStatus defines the observed state of SqlUser
             properties:
               created:
+                description: Boolean indicating the creation process has started
                 type: boolean
               creationTimestamp:
+                description: Timestamp when the user was first created.
                 format: date-time
                 type: string
               lastModifiedTimestamp:
+                description: Timestamp when the user was last updated/checked.
                 format: date-time
                 type: string
             required:

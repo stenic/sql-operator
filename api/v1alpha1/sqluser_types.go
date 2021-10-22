@@ -25,19 +25,22 @@ import (
 
 // SqlUserSpec defines the desired state of SqlUser
 type SqlUserSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Credentials to use for creating the user
 	Credentials SqlCredentials `json:"credentials,omitempty"`
-	HostRef     SqlHostRef     `json:"hostRef"`
+
+	// Reference to the SqlHost
+	HostRef SqlHostRef `json:"hostRef"`
 }
 
 // SqlUserStatus defines the observed state of SqlUser
 type SqlUserStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Boolean indicating the creation process has started
+	Created bool `json:"created"`
 
-	Created               bool         `json:"created"`
-	CreationTimestamp     *metav1.Time `json:"creationTimestamp,omitempty"`
+	// Timestamp when the user was first created.
+	CreationTimestamp *metav1.Time `json:"creationTimestamp,omitempty"`
+
+	// Timestamp when the user was last updated/checked.
 	LastModifiedTimestamp *metav1.Time `json:"lastModifiedTimestamp,omitempty"`
 }
 
