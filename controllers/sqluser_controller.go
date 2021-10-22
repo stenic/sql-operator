@@ -18,9 +18,9 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/stenic/sql-operator/drivers"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -36,6 +36,8 @@ import (
 type SqlUserReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+
+	RefreshRate time.Duration
 }
 
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlusers,verbs=get;list;watch;create;update;patch;delete
@@ -55,7 +57,6 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	finalizerName := "stenic.io/sqluser-deletion"
-	hostNamespacedName := r.getHostNamespacedName(user)
 
 	// examine DeletionTimestamp to determine if object is under deletion
 	if user.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -72,15 +73,12 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		// The object is being deleted
 		if controllerutil.ContainsFinalizer(&user, finalizerName) {
 			// our finalizer is present, so lets handle any external dependency
-			var host steniciov1alpha1.SqlHost
-			if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
-				log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
-				return ctrl.Result{}, err
-			}
 
-			// delete the user
-			if err := r.deleteExternalResource(ctx, user, host); err != nil {
-				return ctrl.Result{}, err
+			if user.Spec.CleanupPolicy == steniciov1alpha1.CleanupPolicyDelete {
+				// delete the user
+				if err := r.deleteExternalResource(ctx, user); err != nil {
+					return ctrl.Result{}, err
+				}
 			}
 
 			// remove our finalizer from the list and update it.
@@ -94,28 +92,17 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 
-	// Lookup the referenced host
-	var host steniciov1alpha1.SqlHost
-	if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
-		log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
-		return ctrl.Result{}, err
+	// Deduplicate control loop
+	if user.Status.LastModifiedTimestamp != nil && time.Since(user.Status.LastModifiedTimestamp.Time) < r.RefreshRate {
+		return ctrl.Result{}, nil
 	}
+
+	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
 	if !user.Status.Created {
-		if err := r.createExternalResource(ctx, user, host); err != nil {
-			log.Error(err, "failed to create SqlUser")
-			return ctrl.Result{}, err
-		}
-
 		user.Status.Created = true
 		user.Status.CreationTimestamp = &metav1.Time{Time: time.Now()}
-	} else {
-		if err := r.updateExternalResource(ctx, user, host); err != nil {
-			log.Error(err, "failed to update SqlUser")
-			return ctrl.Result{}, err
-		}
 	}
-
 	user.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
 
 	if err := r.Status().Update(ctx, &user); err != nil {
@@ -123,44 +110,46 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{}, nil
-	// return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
+	if err := r.upsertExternalResource(ctx, user); err != nil {
+		log.Error(err, "failed to create SqlUser")
+		return scheduledResult, nil
+	}
+
+	return scheduledResult, nil
 }
 
-func (r *SqlUserReconciler) createExternalResource(ctx context.Context, user steniciov1alpha1.SqlUser, host steniciov1alpha1.SqlHost) error {
+func (r *SqlUserReconciler) upsertExternalResource(ctx context.Context, user steniciov1alpha1.SqlUser) error {
 	log := log.FromContext(ctx)
+	hostNamespacedName := r.getHostNamespacedName(user)
 
-	log.Info(fmt.Sprintf(
-		"CREATE USER %s WITH PASSWORD %s;",
-		user.Spec.Credentials.Username,
-		user.Spec.Credentials.Password,
-	))
+	var host steniciov1alpha1.SqlHost
+	if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
+		log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
+		return err
+	}
+
+	driver, err := drivers.GetDriver(host)
+	if err != nil {
+		return err
+	}
+
+	return driver.UpsertUser(ctx, user)
+}
+
+func (r *SqlUserReconciler) deleteExternalResource(ctx context.Context, user steniciov1alpha1.SqlUser) error {
+	log := log.FromContext(ctx)
+	hostNamespacedName := r.getHostNamespacedName(user)
+
+	var host steniciov1alpha1.SqlHost
+	if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
+		log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
+		return err
+	}
+
+	log.Info("DELETE user")
 
 	return nil
 }
-func (r *SqlUserReconciler) deleteExternalResource(ctx context.Context, user steniciov1alpha1.SqlUser, host steniciov1alpha1.SqlHost) error {
-	log := log.FromContext(ctx)
-
-	log.Info(fmt.Sprintf(
-		"DELETE USER %s WITH PASSWORD %s;",
-		user.Spec.Credentials.Username,
-		user.Spec.Credentials.Password,
-	))
-
-	return nil
-}
-func (r *SqlUserReconciler) updateExternalResource(ctx context.Context, user steniciov1alpha1.SqlUser, host steniciov1alpha1.SqlHost) error {
-	log := log.FromContext(ctx)
-
-	log.Info(fmt.Sprintf(
-		"UPDATE USER %s WITH PASSWORD %s;",
-		user.Spec.Credentials.Username,
-		user.Spec.Credentials.Password,
-	))
-
-	return nil
-}
-
 func (r *SqlUserReconciler) getHostNamespacedName(user steniciov1alpha1.SqlUser) types.NamespacedName {
 	if user.Spec.HostRef.Namespace != "" {
 		return types.NamespacedName{

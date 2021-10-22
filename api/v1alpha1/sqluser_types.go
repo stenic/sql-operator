@@ -30,6 +30,13 @@ type SqlUserSpec struct {
 
 	// Reference to the SqlHost
 	HostRef SqlHostRef `json:"hostRef"`
+
+	// Specifies how to handle deletion of a SqlUser.
+	// Valid values are:
+	// - "Retain" (default): keeps the external resource when the object is deleted;
+	// - "Delete": deletes the external resource when the object is deleted;
+	// +optional
+	CleanupPolicy CleanupPolicy `json:"cleanupPolicy,omitempty"`
 }
 
 // SqlUserStatus defines the observed state of SqlUser

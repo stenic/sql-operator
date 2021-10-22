@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -31,6 +32,8 @@ import (
 type SqlHostReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+
+	RefreshRate time.Duration
 }
 
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlhosts,verbs=get;list;watch;create;update;patch;delete

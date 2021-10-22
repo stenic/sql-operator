@@ -22,3 +22,16 @@ type SqlHostRef struct {
 	// Namespace of the SqlHost
 	Namespace string `json:"namespace,omitempty"`
 }
+
+// CleanupPolicy describes how the resource will be handled on delete.
+// +kubebuilder:validation:Enum=Retain;Delete
+type CleanupPolicy string
+
+const (
+	// Keep
+	CleanupPolicyRetain CleanupPolicy = "Retain"
+
+	// ForbidConcurrent forbids concurrent runs, skipping next run if previous
+	// hasn't finished yet.
+	CleanupPolicyDelete CleanupPolicy = "Delete"
+)

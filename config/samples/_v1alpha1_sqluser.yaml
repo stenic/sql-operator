@@ -4,7 +4,8 @@ metadata:
   name: sqluser-sample123
 spec:
   credentials:
-    username: sqloperator
-    password: sqloperator123
+    username: sqloperator_tst
+    password: sqloperator_tst
   hostRef:
     name: sqlhost-sample
+  cleanupPolicy: Delete

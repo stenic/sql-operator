@@ -36,6 +36,15 @@ spec:
           spec:
             description: SqlUserSpec defines the desired state of SqlUser
             properties:
+              cleanupPolicy:
+                description: 'Specifies how to handle deletion of a SqlUser. Valid
+                  values are: - "Retain" (default): keeps the external resource when
+                  the object is deleted; - "Delete": deletes the external resource
+                  when the object is deleted;'
+                enum:
+                - Retain
+                - Delete
+                type: string
               credentials:
                 description: Credentials to use for creating the user
                 properties:
