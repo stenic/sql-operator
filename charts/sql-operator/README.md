@@ -3,15 +3,13 @@
 ## TL;DR;
 
 ```console
-helm repo add stenic https://charts.stenic.io
-helm install my-release --set "service.type=LoadBalancer" stenic/sql-operator
+helm repo add sql-operator https://stenic.github.io/sql-operator/
+helm install sql-operator --namespace sql-operator sql-operator/sql-operator
 ```
 
 ## Introduction
 
 This chart installs `sql-operator` on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
-
-[![openvpn-as](https://raw.githubusercontent.com/stenic/helm-charts/master/img/openvpn-as.png)](https://openvpn.net/index.php/access-server/overview.html)
 
 ## Prerequisites
 
@@ -25,8 +23,8 @@ This chart installs `sql-operator` on a [Kubernetes](http://kubernetes.io) clust
 To install the chart with the release name `my-release`:
 
 ```console
-helm repo add stenic https://charts.stenic.io
-helm install my-release --set "service.type=LoadBalancer" stenic/sql-operator
+helm repo add sql-operator https://stenic.github.io/sql-operator/
+helm install sql-operator --namespace sql-operator sql-operator/sql-operator
 ```
 
 These commands deploy sql-operator on the Kubernetes cluster in the default configuration. The [Parameters](#parameters) section lists the parameters that can be configured during installation.
@@ -64,15 +62,15 @@ The following tables list the configurable parameters of the sql-operator chart 
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  Required if create is false. If not set and create is true, a name is generated using the fullname template |
+| serviceAccount.name | string | `""` |  |
 | sidecarContainers | list | `[]` |  |
 | tolerations | list | `[]` |  |
-| watchNamespaces | string | `""` |  If empty, the sql operator will watch all namespaces in the cluster. |
+| watchNamespaces | string | `""` |  |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```console
-helm install my-release -f values.yaml stenic/sql-operator
+helm install my-release -f values.yaml sql-operator/sql-operator
 ```
