@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/stenic/sql-operator/compare/v1.2.1...v1.2.2) (2021-10-23)
+
+
+### Bug Fixes
+
+* Fix copy-past error ([46fdcdd](https://github.com/stenic/sql-operator/commit/46fdcdd616dc1a38f464b6979bbc4514306be976))
+
 ## [1.2.1](https://github.com/stenic/sql-operator/compare/v1.2.0...v1.2.1) (2021-10-23)
 
 
