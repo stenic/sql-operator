@@ -1,0 +1,4 @@
+chart-dirs:
+  - charts
+remote: origin
+target-branch: master
