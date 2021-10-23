@@ -107,12 +107,12 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "SqlHost")
 		os.Exit(1)
 	}
-	if err = (&controllers.SqlGrantsReconciler{
+	if err = (&controllers.SqlGrantReconciler{
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SqlGrants")
+		setupLog.Error(err, "unable to create controller", "controller", "SqlGrant")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

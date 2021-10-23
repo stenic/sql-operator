@@ -1,5 +1,5 @@
 apiVersion: stenic.io/v1alpha1
-kind: SqlGrants
+kind: SqlGrant
 metadata:
   name: sqlgrants-sample
 spec:

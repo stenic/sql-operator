@@ -31,8 +31,8 @@ import (
 	"github.com/stenic/sql-operator/drivers"
 )
 
-// SqlGrantsReconciler reconciles a SqlGrants object
-type SqlGrantsReconciler struct {
+// SqlGrantReconciler reconciles a SqlGrant object
+type SqlGrantReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
@@ -46,35 +46,37 @@ type SqlGrantsReconciler struct {
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 // TODO(user): Modify the Reconcile function to compare the state specified by
-// the SqlGrants object against the actual cluster state, and then
+// the SqlGrant object against the actual cluster state, and then
 // perform operations to make the cluster state reflect the state specified by
 // the user.
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
-func (r *SqlGrantsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
-	var grants steniciov1alpha1.SqlGrants
+	var grants steniciov1alpha1.SqlGrant
 	if err := r.Get(ctx, req.NamespacedName, &grants); err != nil {
-		// log.Error(err, "unable to fetch SqlGrants")
+		// log.Error(err, "unable to fetch SqlGrant")
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+
+	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, getNamespacedName(grants.Spec.HostRef, grants.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return scheduledResult, client.IgnoreNotFound(err)
 	}
 	var user steniciov1alpha1.SqlUser
 	if err := r.Get(ctx, getNamespacedName(grants.Spec.UserRef, grants.Namespace), &user); err != nil {
 		log.Error(err, "unable to find SqlUser for "+grants.Name)
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return scheduledResult, client.IgnoreNotFound(err)
 	}
 	var database steniciov1alpha1.SqlDatabase
 	if err := r.Get(ctx, getNamespacedName(grants.Spec.DatabaseRef, grants.Namespace), &database); err != nil {
 		log.Error(err, "unable to find SqlDatabase for "+grants.Name)
-		return ctrl.Result{}, client.IgnoreNotFound(err)
+		return scheduledResult, client.IgnoreNotFound(err)
 	}
 
 	driver, err := drivers.GetDriver(host)
@@ -122,8 +124,6 @@ func (r *SqlGrantsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, nil
 	}
 
-	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
-
 	if grants.Status.CurrentGrants == nil {
 		grants.Status.CurrentGrants = []string{}
 	}
@@ -135,18 +135,18 @@ func (r *SqlGrantsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	grants.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
 
 	if err := r.Status().Update(ctx, &grants); err != nil {
-		log.Error(err, "unable to update SqlGrants status")
+		log.Error(err, "unable to update SqlGrant status")
 		return ctrl.Result{}, err
 	}
 
 	if err = driver.UpsertGrants(ctx, grants, user, database); err != nil {
-		log.Error(err, "failed to create SqlGrants")
+		log.Error(err, "failed to create SqlGrant")
 		return ctrl.Result{}, err
 	}
 
 	grants.Status.CurrentGrants = grants.Spec.Grants
 	if err := r.Status().Update(ctx, &grants); err != nil {
-		log.Error(err, "unable to update SqlGrants status")
+		log.Error(err, "unable to update SqlGrant status")
 		return ctrl.Result{}, err
 	}
 
@@ -154,8 +154,8 @@ func (r *SqlGrantsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *SqlGrantsReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *SqlGrantReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&steniciov1alpha1.SqlGrants{}).
+		For(&steniciov1alpha1.SqlGrant{}).
 		Complete(r)
 }

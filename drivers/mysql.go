@@ -127,7 +127,7 @@ func (d *MySqlDriver) DeleteDatabase(ctx context.Context, database steniciov1alp
 	return nil
 }
 
-func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.SqlGrants, user steniciov1alpha1.SqlUser, database steniciov1alpha1.SqlDatabase) error {
+func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.SqlGrant, user steniciov1alpha1.SqlUser, database steniciov1alpha1.SqlDatabase) error {
 	log := log.FromContext(ctx)
 	db, err := d.connect()
 	if err != nil {
@@ -220,7 +220,7 @@ func difference(a, b []string) []string {
 	return diff
 }
 
-func (d *MySqlDriver) DeleteGrants(ctx context.Context, grants steniciov1alpha1.SqlGrants, user steniciov1alpha1.SqlUser, database steniciov1alpha1.SqlDatabase) error {
+func (d *MySqlDriver) DeleteGrants(ctx context.Context, grants steniciov1alpha1.SqlGrant, user steniciov1alpha1.SqlUser, database steniciov1alpha1.SqlDatabase) error {
 	log := log.FromContext(ctx)
 
 	db, err := d.connect()

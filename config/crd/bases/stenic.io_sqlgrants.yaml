@@ -10,10 +10,10 @@ metadata:
 spec:
   group: stenic.io
   names:
-    kind: SqlGrants
-    listKind: SqlGrantsList
+    kind: SqlGrant
+    listKind: SqlGrantList
     plural: sqlgrants
-    singular: sqlgrants
+    singular: sqlgrant
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -35,7 +35,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: SqlGrants is the Schema for the sqlgrants API
+        description: SqlGrant is the Schema for the sqlgrant API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -50,7 +50,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: SqlGrantsSpec defines the desired state of SqlGrants
+            description: SqlGrantSpec defines the desired state of SqlGrant
             properties:
               cleanupPolicy:
                 description: 'Specifies how to handle deletion of a SqlUser. Valid
@@ -103,7 +103,7 @@ spec:
             - userRef
             type: object
           status:
-            description: SqlGrantsStatus defines the observed state of SqlGrants
+            description: SqlGrantStatus defines the observed state of SqlGrant
             properties:
               created:
                 description: Boolean indicating the creation process has started

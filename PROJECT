@@ -33,7 +33,7 @@ resources:
     namespaced: true
   controller: true
   domain: stenic.io
-  kind: SqlGrants
+  kind: SqlGrant
   path: github.com/stenic/sql-operator/api/v1alpha1
   version: v1alpha1
 version: "3"

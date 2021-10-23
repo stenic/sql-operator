@@ -23,8 +23,8 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// SqlGrantsSpec defines the desired state of SqlGrants
-type SqlGrantsSpec struct {
+// SqlGrantSpec defines the desired state of SqlGrant
+type SqlGrantSpec struct {
 	// Reference to the SqlHost
 	HostRef SqlObjectRef `json:"hostRef"`
 
@@ -45,8 +45,8 @@ type SqlGrantsSpec struct {
 	CleanupPolicy CleanupPolicy `json:"cleanupPolicy,omitempty"`
 }
 
-// SqlGrantsStatus defines the observed state of SqlGrants
-type SqlGrantsStatus struct {
+// SqlGrantStatus defines the observed state of SqlGrant
+type SqlGrantStatus struct {
 	// Boolean indicating the creation process has started
 	Created bool `json:"created"`
 
@@ -66,24 +66,24 @@ type SqlGrantsStatus struct {
 //+kubebuilder:printcolumn:name="Database",type="string",JSONPath=".spec.databaseRef.name",description="Name of the database"
 //+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
-// SqlGrants is the Schema for the sqlgrants API
-type SqlGrants struct {
+// SqlGrant is the Schema for the sqlgrant API
+type SqlGrant struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SqlGrantsSpec   `json:"spec,omitempty"`
-	Status SqlGrantsStatus `json:"status,omitempty"`
+	Spec   SqlGrantSpec   `json:"spec,omitempty"`
+	Status SqlGrantStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// SqlGrantsList contains a list of SqlGrants
-type SqlGrantsList struct {
+// SqlGrantList contains a list of SqlGrant
+type SqlGrantList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SqlGrants `json:"items"`
+	Items           []SqlGrant `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&SqlGrants{}, &SqlGrantsList{})
+	SchemeBuilder.Register(&SqlGrant{}, &SqlGrantList{})
 }
