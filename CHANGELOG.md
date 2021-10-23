@@ -1,3 +1,17 @@
+# [1.2.0](https://github.com/stenic/sql-operator/compare/v1.1.0...v1.2.0) (2021-10-23)
+
+
+### Bug Fixes
+
+* Cleanup ([3b3cabd](https://github.com/stenic/sql-operator/commit/3b3cabd7687b9a1c6a2cabc171ce0293a40ec326))
+
+
+### Features
+
+* Release charts ([55a36b6](https://github.com/stenic/sql-operator/commit/55a36b6622e3358a2e3360da5fdd0057585ed2fd))
+* Release charts ([6054a32](https://github.com/stenic/sql-operator/commit/6054a32a076ce590be0edc15896967ef8f9eb76d))
+* Update chart maintainers ([84cea14](https://github.com/stenic/sql-operator/commit/84cea14d741aaad3f596edb7129804b9f20b60d8))
+
 # [1.1.0](https://github.com/stenic/sql-operator/compare/v1.0.0...v1.1.0) (2021-10-23)
 
 
