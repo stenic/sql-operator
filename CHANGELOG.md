@@ -1,3 +1,11 @@
+## [1.2.3](https://github.com/stenic/sql-operator/compare/v1.2.2...v1.2.3) (2021-10-23)
+
+
+### Bug Fixes
+
+* Render README.md ([bfc75f0](https://github.com/stenic/sql-operator/commit/bfc75f033d6b5dcf47b6d46a84d7ca31cd7d1088))
+* Render README.md ([55c5a20](https://github.com/stenic/sql-operator/commit/55c5a2044dac5d82bc02c2d5f95dcb1fe3e27e92))
+
 ## [1.2.2](https://github.com/stenic/sql-operator/compare/v1.2.1...v1.2.2) (2021-10-23)
 
 
