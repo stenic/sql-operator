@@ -1,0 +1,412 @@
+# Copyright 2021 Stenic BV.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.5.0
+  creationTimestamp: null
+  name: sqldatabases.stenic.io
+spec:
+  group: stenic.io
+  names:
+    kind: SqlDatabase
+    listKind: SqlDatabaseList
+    plural: sqldatabases
+    singular: sqldatabase
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Name of the host
+      jsonPath: .spec.hostRef.name
+      name: Host
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SqlDatabase is the Schema for the sqldatabases API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SqlDatabaseSpec defines the desired state of SqlDatabase
+            properties:
+              cleanupPolicy:
+                description: 'Specifies how to handle deletion of a SqlUser. Valid values are: - "Retain" (default): keeps the external resource when the object is deleted; - "Delete": deletes the external resource when the object is deleted;'
+                enum:
+                - Retain
+                - Delete
+                type: string
+              databaseName:
+                description: Name of the external database
+                type: string
+              hostRef:
+                description: Reference to the SqlHost
+                properties:
+                  name:
+                    description: Name of the SqlObject
+                    type: string
+                  namespace:
+                    description: Namespace of the SqlObject
+                    type: string
+                type: object
+            required:
+            - databaseName
+            - hostRef
+            type: object
+          status:
+            description: SqlDatabaseStatus defines the observed state of SqlDatabase
+            properties:
+              created:
+                description: Boolean indicating the creation process has started
+                type: boolean
+              creationTimestamp:
+                description: Timestamp when the user was first created.
+                format: date-time
+                type: string
+              lastModifiedTimestamp:
+                description: Timestamp when the user was last updated/checked.
+                format: date-time
+                type: string
+            required:
+            - created
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.5.0
+  creationTimestamp: null
+  name: sqlgrants.stenic.io
+spec:
+  group: stenic.io
+  names:
+    kind: SqlGrant
+    listKind: SqlGrantList
+    plural: sqlgrants
+    singular: sqlgrant
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Name of the host
+      jsonPath: .spec.hostRef.name
+      name: Host
+      type: string
+    - description: Name of the user
+      jsonPath: .spec.userRef.name
+      name: User
+      type: string
+    - description: Name of the database
+      jsonPath: .spec.databaseRef.name
+      name: Database
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SqlGrant is the Schema for the sqlgrant API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SqlGrantSpec defines the desired state of SqlGrant
+            properties:
+              cleanupPolicy:
+                description: 'Specifies how to handle deletion of a SqlUser. Valid values are: - "Retain" (default): keeps the external resource when the object is deleted; - "Delete": deletes the external resource when the object is deleted;'
+                enum:
+                - Retain
+                - Delete
+                type: string
+              databaseRef:
+                description: Reference to the SqlUser
+                properties:
+                  name:
+                    description: Name of the SqlObject
+                    type: string
+                  namespace:
+                    description: Namespace of the SqlObject
+                    type: string
+                type: object
+              grants:
+                description: List of grants
+                items:
+                  type: string
+                type: array
+              hostRef:
+                description: Reference to the SqlHost
+                properties:
+                  name:
+                    description: Name of the SqlObject
+                    type: string
+                  namespace:
+                    description: Namespace of the SqlObject
+                    type: string
+                type: object
+              userRef:
+                description: Reference to the SqlUser
+                properties:
+                  name:
+                    description: Name of the SqlObject
+                    type: string
+                  namespace:
+                    description: Namespace of the SqlObject
+                    type: string
+                type: object
+            required:
+            - databaseRef
+            - grants
+            - hostRef
+            - userRef
+            type: object
+          status:
+            description: SqlGrantStatus defines the observed state of SqlGrant
+            properties:
+              created:
+                description: Boolean indicating the creation process has started
+                type: boolean
+              creationTimestamp:
+                description: Timestamp when the user was first created.
+                format: date-time
+                type: string
+              currentGrants:
+                items:
+                  type: string
+                type: array
+              lastModifiedTimestamp:
+                description: Timestamp when the user was last updated/checked.
+                format: date-time
+                type: string
+            required:
+            - created
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.5.0
+  creationTimestamp: null
+  name: sqlhosts.stenic.io
+spec:
+  group: stenic.io
+  names:
+    kind: SqlHost
+    listKind: SqlHostList
+    plural: sqlhosts
+    singular: sqlhost
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SqlHost is the Schema for the sqlhosts API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SqlHostSpec defines the desired state of SqlHost
+            properties:
+              credentials:
+                description: Credentials to use when connecting to the endpoint
+                properties:
+                  password:
+                    description: Password for the sql user
+                    type: string
+                  username:
+                    description: Username for the sql user
+                    type: string
+                type: object
+              endpoint:
+                description: Endpoint to manage
+                properties:
+                  host:
+                    description: Host of the sql server. This can be either dns or ip
+                    type: string
+                  port:
+                    description: Port to use when connecting to the sql server
+                    type: integer
+                type: object
+              engine:
+                description: Engine of the external endpoint (like Mysql)
+                enum:
+                - Mysql
+                type: string
+            required:
+            - credentials
+            - endpoint
+            - engine
+            type: object
+          status:
+            description: SqlHostStatus defines the observed state of SqlHost
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.5.0
+  creationTimestamp: null
+  name: sqlusers.stenic.io
+spec:
+  group: stenic.io
+  names:
+    kind: SqlUser
+    listKind: SqlUserList
+    plural: sqlusers
+    singular: sqluser
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Name of the host
+      jsonPath: .spec.hostRef.name
+      name: Host
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SqlUser is the Schema for the sqlusers API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SqlUserSpec defines the desired state of SqlUser
+            properties:
+              cleanupPolicy:
+                description: 'Specifies how to handle deletion of a SqlUser. Valid values are: - "Retain" (default): keeps the external resource when the object is deleted; - "Delete": deletes the external resource when the object is deleted;'
+                enum:
+                - Retain
+                - Delete
+                type: string
+              credentials:
+                description: Credentials to use for creating the user
+                properties:
+                  password:
+                    description: Password for the sql user
+                    type: string
+                  username:
+                    description: Username for the sql user
+                    type: string
+                type: object
+              hostRef:
+                description: Reference to the SqlHost
+                properties:
+                  name:
+                    description: Name of the SqlObject
+                    type: string
+                  namespace:
+                    description: Namespace of the SqlObject
+                    type: string
+                type: object
+            required:
+            - hostRef
+            type: object
+          status:
+            description: SqlUserStatus defines the observed state of SqlUser
+            properties:
+              created:
+                description: Boolean indicating the creation process has started
+                type: boolean
+              creationTimestamp:
+                description: Timestamp when the user was first created.
+                format: date-time
+                type: string
+              lastModifiedTimestamp:
+                description: Timestamp when the user was last updated/checked.
+                format: date-time
+                type: string
+            required:
+            - created
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

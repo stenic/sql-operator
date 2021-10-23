@@ -52,7 +52,7 @@ type SqlHostReconciler struct {
 func (r *SqlHostReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// your logic here
+	// Just a data resource
 
 	return ctrl.Result{}, nil
 }

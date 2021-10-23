@@ -2,35 +2,33 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    control-plane: controller-manager
-  name: system
+    control-plane: sql-operator
+  name: sql-operator
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: controller-manager
+  name: sql-operator
   namespace: system
   labels:
-    control-plane: controller-manager
+    control-plane: sql-operator
 spec:
   selector:
     matchLabels:
-      control-plane: controller-manager
+      control-plane: sql-operator
   replicas: 1
   template:
     metadata:
       labels:
-        control-plane: controller-manager
+        control-plane: sql-operator
     spec:
       securityContext:
         runAsNonRoot: true
       containers:
-      - command:
-        - /manager
+      - name: sql-operator
         args:
         - --leader-elect
         image: ghcr.io/stenic/sql-operator:latest
-        name: manager
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
@@ -52,5 +50,5 @@ spec:
           requests:
             cpu: 100m
             memory: 20Mi
-      serviceAccountName: controller-manager
+      serviceAccountName: sql-operator
       terminationGracePeriodSeconds: 10
