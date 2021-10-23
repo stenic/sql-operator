@@ -23,3 +23,6 @@ testbin/*
 *.swp
 *.swo
 *~
+
+# Directory to test generated files
+generated-check

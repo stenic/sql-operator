@@ -5,6 +5,10 @@ Operate sql databases, users and grants.
 > This is a WIP project and should not at all be used in production at this time.
 > Feel free to validate in CI pipelines.
 
+# Engines
+
+Currenty, only MySQL is supported.
+
 ## Example
 
 ```yaml
@@ -73,4 +77,5 @@ spec:
 ## Roadmap
 
  - [ ] SqlDatabase - Seed database on create
+ - [ ] Add a system to keep track of external resources owned by the operator
 

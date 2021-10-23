@@ -35,19 +35,75 @@ all: build
 help: ## Display this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
+
+
+clean: ## Clean build directories across the project
+	rm -rf ./bin
+	rm -rf ./testbin
+	rm -rf ./release-artifacts
+	rm -rf ./charts/*/charts ./charts/*/Chart.lock
+	rm -rf ./cover.out
+	rm -rf ./generated-check
+
+mod-tidy: ## Make sure the go mod files are up-to-date
+	export GO111MODULE=on; go mod tidy
+
 ##@ Development
 
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=sql-operator-role webhook paths="./api/..." paths="./controllers/." output:crd:artifacts:config=config/crd/bases
+	CONFIG_DIRECTORY=$(or $(TMP_CONFIG_OUTPUT_DIRECTORY),config) HELM_DIRECTORY=$(or $(TMP_HELM_OUTPUT_DIRECTORY),charts) ./hack/config/copy_crds_roles_helm.sh
+	
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+	$(CONTROLLER_GEN) object:headerFile="./hack/headers/header.go.txt" paths=$(or $(TMP_API_DIRECTORY),"./...")
+
+##@ Tests and Checks
+
+check: lint test ## Do all checks, lints and tests for the Solr Operator
+
+lint: check-mod vet check-manifests check-generated check-helm ## Lint the codebase to check for formatting and correctness
 
 fmt: ## Run go fmt against code.
 	go fmt ./...
 
 vet: ## Run go vet against code.
 	go vet ./...
+
+check-manifests: ## Ensure the manifest files (CRDs, RBAC, etc) are up-to-date across the project, including the helm charts
+	rm -rf generated-check
+	mkdir -p generated-check
+	cp -r charts generated-check/charts
+	cp -r config generated-check/config
+	TMP_CONFIG_OUTPUT_DIRECTORY=generated-check/config TMP_HELM_OUTPUT_DIRECTORY=generated-check/charts make manifests
+	@echo "Check to make sure the manifests are up to date"
+	diff --recursive config generated-check/config
+	diff --recursive charts generated-check/charts
+
+check-generated: ## Ensure the generated code is up-to-date
+	rm -rf generated-check
+	mkdir -p generated-check
+	cp -r api generated-check/api
+	TMP_API_DIRECTORY="./generated-check/api/..." make generate
+	@echo "Check to make sure the generated code is up to date"
+	diff --recursive api generated-check/api
+
+check-mod: ## Ensure the go mod files are up-to-date
+	rm -rf generated-check
+	mkdir -p generated-check/existing-go-mod generated-check/go-mod
+	cp go.* generated-check/existing-go-mod/.
+	make mod-tidy
+	cp go.* generated-check/go-mod/.
+	mv generated-check/existing-go-mod/go.* .
+	@echo "Check to make sure the go mod info is up to date"
+	diff go.mod generated-check/go-mod/go.mod
+	diff go.sum generated-check/go-mod/go.sum
+
+check-helm: ## Ensure the helm charts lint successfully
+	helm lint charts/*
+
+check-git: ## Check to make sure the repo does not have uncommitted code
+	git diff --exit-code
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test: manifests generate fmt vet ## Run tests.
@@ -87,7 +143,7 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
-	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.4.1)
+	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.5.0)
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.

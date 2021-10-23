@@ -1,0 +1,45 @@
+name: Build & Test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+
+jobs:
+  test:
+    name: Build and Test Operator
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go: [ '1.16' ]
+
+    steps:
+      # Setup
+      - uses: actions/checkout@v2
+      - name: Setup go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      # Cleanup & Install dependencies
+      - run: make clean
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-code-dependencies-${{ hashFiles('go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-code-dependencies
+      # Build
+      - run: make manifests
+      - run: make build
+
+      # Test
+      - run: make lint
+      - run: make test
+      - run: make check-git
