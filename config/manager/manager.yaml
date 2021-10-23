@@ -29,7 +29,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: controller:latest
+        image: ghcr.io/stenic/sql-operator:latest
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
