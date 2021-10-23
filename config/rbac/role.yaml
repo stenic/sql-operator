@@ -35,6 +35,32 @@ rules:
 - apiGroups:
   - stenic.io
   resources:
+  - sqlgrants
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlgrants/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlgrants/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - stenic.io
+  resources:
   - sqlhosts
   verbs:
   - create

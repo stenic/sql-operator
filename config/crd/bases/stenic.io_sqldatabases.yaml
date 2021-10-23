@@ -16,7 +16,15 @@ spec:
     singular: sqldatabase
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - description: Name of the host
+      jsonPath: .spec.hostRef.name
+      name: Host
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: SqlDatabase is the Schema for the sqldatabases API
@@ -52,10 +60,10 @@ spec:
                 description: Reference to the SqlHost
                 properties:
                   name:
-                    description: Name of the SqlHost
+                    description: Name of the SqlObject
                     type: string
                   namespace:
-                    description: Namespace of the SqlHost
+                    description: Namespace of the SqlObject
                     type: string
                 type: object
             required:

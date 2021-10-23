@@ -16,10 +16,10 @@ type SqlCredentials struct {
 	Password string `json:"password,omitempty"`
 }
 
-type SqlHostRef struct {
-	// Name of the SqlHost
+type SqlObjectRef struct {
+	// Name of the SqlObject
 	Name string `json:"name,omitempty"`
-	// Namespace of the SqlHost
+	// Namespace of the SqlObject
 	Namespace string `json:"namespace,omitempty"`
 }
 

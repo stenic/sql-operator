@@ -26,7 +26,7 @@ import (
 // SqlUserSpec defines the desired state of SqlUser
 type SqlUserSpec struct {
 	// Reference to the SqlHost
-	HostRef SqlHostRef `json:"hostRef"`
+	HostRef SqlObjectRef `json:"hostRef"`
 
 	// Credentials to use for creating the user
 	Credentials SqlCredentials `json:"credentials,omitempty"`
@@ -53,6 +53,8 @@ type SqlUserStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="Host",type="string",JSONPath=".spec.hostRef.name",description="Name of the host"
+//+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
 // SqlUser is the Schema for the sqlusers API
 type SqlUser struct {

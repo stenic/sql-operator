@@ -22,7 +22,6 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -63,10 +62,9 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	hostNamespacedName := r.getHostNamespacedName(database)
 	var host steniciov1alpha1.SqlHost
-	if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
-		log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
+	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, database.Namespace), &host); err != nil {
+		log.Error(err, "unable to find SqlHost for "+database.Name)
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -134,19 +132,6 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	}
 
 	return scheduledResult, nil
-}
-
-func (r *SqlDatabaseReconciler) getHostNamespacedName(database steniciov1alpha1.SqlDatabase) types.NamespacedName {
-	if database.Spec.HostRef.Namespace != "" {
-		return types.NamespacedName{
-			Namespace: database.Spec.HostRef.Namespace,
-			Name:      database.Spec.HostRef.Name,
-		}
-	}
-	return types.NamespacedName{
-		Namespace: database.Namespace,
-		Name:      database.Spec.HostRef.Name,
-	}
 }
 
 // SetupWithManager sets up the controller with the Manager.

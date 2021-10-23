@@ -22,7 +22,6 @@ import (
 
 	"github.com/stenic/sql-operator/drivers"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -56,10 +55,9 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	hostNamespacedName := r.getHostNamespacedName(user)
 	var host steniciov1alpha1.SqlHost
-	if err := r.Get(ctx, hostNamespacedName, &host); err != nil {
-		log.Error(err, "unable to find SqlHost "+hostNamespacedName.Name+" in "+hostNamespacedName.Namespace)
+	if err := r.Get(ctx, getNamespacedName(user.Spec.HostRef, user.Namespace), &host); err != nil {
+		log.Error(err, "unable to find SqlHost for "+user.Name)
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -127,19 +125,6 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	return scheduledResult, nil
-}
-
-func (r *SqlUserReconciler) getHostNamespacedName(user steniciov1alpha1.SqlUser) types.NamespacedName {
-	if user.Spec.HostRef.Namespace != "" {
-		return types.NamespacedName{
-			Namespace: user.Spec.HostRef.Namespace,
-			Name:      user.Spec.HostRef.Name,
-		}
-	}
-	return types.NamespacedName{
-		Namespace: user.Namespace,
-		Name:      user.Spec.HostRef.Name,
-	}
 }
 
 // SetupWithManager sets up the controller with the Manager.

@@ -1,0 +1,20 @@
+# permissions for end users to view sqlgrants.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sqlgrants-viewer-role
+rules:
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlgrants
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - stenic.io
+  resources:
+  - sqlgrants/status
+  verbs:
+  - get

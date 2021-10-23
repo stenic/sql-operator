@@ -23,13 +23,19 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// SqlDatabaseSpec defines the desired state of SqlDatabase
-type SqlDatabaseSpec struct {
+// SqlGrantsSpec defines the desired state of SqlGrants
+type SqlGrantsSpec struct {
 	// Reference to the SqlHost
 	HostRef SqlObjectRef `json:"hostRef"`
 
-	// Name of the external database
-	DatabaseName string `json:"databaseName"`
+	// Reference to the SqlUser
+	UserRef SqlObjectRef `json:"userRef"`
+
+	// Reference to the SqlUser
+	DatabaseRef SqlObjectRef `json:"databaseRef"`
+
+	// List of grants
+	Grants []string `json:"grants"`
 
 	// Specifies how to handle deletion of a SqlUser.
 	// Valid values are:
@@ -39,8 +45,8 @@ type SqlDatabaseSpec struct {
 	CleanupPolicy CleanupPolicy `json:"cleanupPolicy,omitempty"`
 }
 
-// SqlDatabaseStatus defines the observed state of SqlDatabase
-type SqlDatabaseStatus struct {
+// SqlGrantsStatus defines the observed state of SqlGrants
+type SqlGrantsStatus struct {
 	// Boolean indicating the creation process has started
 	Created bool `json:"created"`
 
@@ -49,31 +55,35 @@ type SqlDatabaseStatus struct {
 
 	// Timestamp when the user was last updated/checked.
 	LastModifiedTimestamp *metav1.Time `json:"lastModifiedTimestamp,omitempty"`
+
+	CurrentGrants []string `json:"currentGrants,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:name="Host",type="string",JSONPath=".spec.hostRef.name",description="Name of the host"
+//+kubebuilder:printcolumn:name="User",type="string",JSONPath=".spec.userRef.name",description="Name of the user"
+//+kubebuilder:printcolumn:name="Database",type="string",JSONPath=".spec.databaseRef.name",description="Name of the database"
 //+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
 
-// SqlDatabase is the Schema for the sqldatabases API
-type SqlDatabase struct {
+// SqlGrants is the Schema for the sqlgrants API
+type SqlGrants struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SqlDatabaseSpec   `json:"spec,omitempty"`
-	Status SqlDatabaseStatus `json:"status,omitempty"`
+	Spec   SqlGrantsSpec   `json:"spec,omitempty"`
+	Status SqlGrantsStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// SqlDatabaseList contains a list of SqlDatabase
-type SqlDatabaseList struct {
+// SqlGrantsList contains a list of SqlGrants
+type SqlGrantsList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SqlDatabase `json:"items"`
+	Items           []SqlGrants `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&SqlDatabase{}, &SqlDatabaseList{})
+	SchemeBuilder.Register(&SqlGrants{}, &SqlGrantsList{})
 }

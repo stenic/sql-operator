@@ -6,14 +6,14 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: sqlusers.stenic.io
+  name: sqlgrants.stenic.io
 spec:
   group: stenic.io
   names:
-    kind: SqlUser
-    listKind: SqlUserList
-    plural: sqlusers
-    singular: sqluser
+    kind: SqlGrants
+    listKind: SqlGrantsList
+    plural: sqlgrants
+    singular: sqlgrants
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -21,13 +21,21 @@ spec:
       jsonPath: .spec.hostRef.name
       name: Host
       type: string
+    - description: Name of the user
+      jsonPath: .spec.userRef.name
+      name: User
+      type: string
+    - description: Name of the database
+      jsonPath: .spec.databaseRef.name
+      name: Database
+      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: SqlUser is the Schema for the sqlusers API
+        description: SqlGrants is the Schema for the sqlgrants API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -42,7 +50,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: SqlUserSpec defines the desired state of SqlUser
+            description: SqlGrantsSpec defines the desired state of SqlGrants
             properties:
               cleanupPolicy:
                 description: 'Specifies how to handle deletion of a SqlUser. Valid
@@ -53,16 +61,21 @@ spec:
                 - Retain
                 - Delete
                 type: string
-              credentials:
-                description: Credentials to use for creating the user
+              databaseRef:
+                description: Reference to the SqlUser
                 properties:
-                  password:
-                    description: Password for the sql user
+                  name:
+                    description: Name of the SqlObject
                     type: string
-                  username:
-                    description: Username for the sql user
+                  namespace:
+                    description: Namespace of the SqlObject
                     type: string
                 type: object
+              grants:
+                description: List of grants
+                items:
+                  type: string
+                type: array
               hostRef:
                 description: Reference to the SqlHost
                 properties:
@@ -73,11 +86,24 @@ spec:
                     description: Namespace of the SqlObject
                     type: string
                 type: object
+              userRef:
+                description: Reference to the SqlUser
+                properties:
+                  name:
+                    description: Name of the SqlObject
+                    type: string
+                  namespace:
+                    description: Namespace of the SqlObject
+                    type: string
+                type: object
             required:
+            - databaseRef
+            - grants
             - hostRef
+            - userRef
             type: object
           status:
-            description: SqlUserStatus defines the observed state of SqlUser
+            description: SqlGrantsStatus defines the observed state of SqlGrants
             properties:
               created:
                 description: Boolean indicating the creation process has started
@@ -86,6 +112,10 @@ spec:
                 description: Timestamp when the user was first created.
                 format: date-time
                 type: string
+              currentGrants:
+                items:
+                  type: string
+                type: array
               lastModifiedTimestamp:
                 description: Timestamp when the user was last updated/checked.
                 format: date-time

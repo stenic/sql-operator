@@ -25,4 +25,6 @@ type Driver interface {
 	DeleteUser(context.Context, steniciov1alpha1.SqlUser) error
 	UpsertDatabase(context.Context, steniciov1alpha1.SqlDatabase) error
 	DeleteDatabase(context.Context, steniciov1alpha1.SqlDatabase) error
+	UpsertGrants(context.Context, steniciov1alpha1.SqlGrants, steniciov1alpha1.SqlUser, steniciov1alpha1.SqlDatabase) error
+	DeleteGrants(context.Context, steniciov1alpha1.SqlGrants, steniciov1alpha1.SqlUser, steniciov1alpha1.SqlDatabase) error
 }

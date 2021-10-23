@@ -108,8 +108,9 @@ func main() {
 		os.Exit(1)
 	}
 	if err = (&controllers.SqlGrantsReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:      mgr.GetClient(),
+		Scheme:      mgr.GetScheme(),
+		RefreshRate: refreshRateVal,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SqlGrants")
 		os.Exit(1)
