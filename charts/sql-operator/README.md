@@ -15,8 +15,6 @@ This chart installs `sql-operator` on a [Kubernetes](http://kubernetes.io) clust
 
 - Kubernetes 1.12+
 - Helm 3.0+
-- LoadBalancer to expose the vpn service
-- PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
 
