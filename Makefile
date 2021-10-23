@@ -50,9 +50,10 @@ mod-tidy: ## Make sure the go mod files are up-to-date
 
 ##@ Development
 
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: controller-gen helm-docs ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=sql-operator-role webhook paths="./api/..." paths="./controllers/." output:crd:artifacts:config=config/crd/bases
 	CONFIG_DIRECTORY=$(or $(TMP_CONFIG_OUTPUT_DIRECTORY),config) HELM_DIRECTORY=$(or $(TMP_HELM_OUTPUT_DIRECTORY),charts) ./hack/config/copy_crds_roles_helm.sh
+	$(HELM_DOCS)
 	
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
@@ -144,6 +145,10 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.5.0)
+
+HELM_DOCS = $(shell pwd)/bin/helm-docs
+helm-docs: ## Download helm-docs locally if necessary.
+	$(call go-get-tool,$(HELM_DOCS),github.com/norwoodj/helm-docs/cmd/helm-docs@v1.6.0)
 
 KUSTOMIZE = $(shell pwd)/bin/kustomize
 kustomize: ## Download kustomize locally if necessary.
