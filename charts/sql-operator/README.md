@@ -62,10 +62,10 @@ The following tables list the configurable parameters of the sql-operator chart 
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  |
+| serviceAccount.name | string | `""` |  Required if create is false. If not set and create is true, a name is generated using the fullname template |
 | sidecarContainers | list | `[]` |  |
 | tolerations | list | `[]` |  |
-| watchNamespaces | string | `""` |  |
+| watchNamespaces | string | `""` |  If empty, the sql operator will watch all namespaces in the cluster. |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
