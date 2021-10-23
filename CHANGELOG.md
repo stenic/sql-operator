@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/stenic/sql-operator/compare/v1.0.0...v1.1.0) (2021-10-23)
+
+
+### Features
+
+* Add pipeline ([#5](https://github.com/stenic/sql-operator/issues/5)) ([029729c](https://github.com/stenic/sql-operator/commit/029729cf639a88fc61fbf478390413b09938c34a))
+* More builds ([031f8c5](https://github.com/stenic/sql-operator/commit/031f8c594cd28f8cc09dd7835fa4167e9b5bc289))
+
 # 1.0.0 (2021-10-23)
 
 
