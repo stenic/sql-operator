@@ -50,7 +50,6 @@ spec:
         {{- if .Values.watchNamespaces }}
         - --watch-namespaces={{- include "sql-operator.watchNamespaces" . -}}
         {{- end }}
-
         env:
           - name: POD_NAMESPACE
             valueFrom:
@@ -63,7 +62,6 @@ spec:
           {{- if .Values.envVars }}
           {{- toYaml .Values.envVars | nindent 10 }}
           {{- end }}
-
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
@@ -78,10 +76,8 @@ spec:
             port: 8081
           initialDelaySeconds: 5
           periodSeconds: 10
-
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
-
       {{- if .Values.sidecarContainers }}
       {{ toYaml .Values.sidecarContainers | nindent 6 }}
       {{- end }}
