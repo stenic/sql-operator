@@ -2,6 +2,18 @@ apiVersion: v1
 entries:
   sql-operator:
   - apiVersion: v2
+    created: "2021-10-25T20:01:57.852102924Z"
+    description: Manage your Sql servers
+    digest: f5b4fbfaff59b2edd6400a0a27a14b7da8a36aba88c3c3ee0af4f83b7157e3f8
+    maintainers:
+    - email: dries@stenic.io
+      name: NoUseFreak
+      url: https://stenic.io
+    name: sql-operator
+    urls:
+    - https://github.com/stenic/sql-operator/releases/download/sql-operator-0.1.6/sql-operator-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
     created: "2021-10-23T22:04:13.148243258Z"
     description: Manage your Sql servers
     digest: bcc9c5d5d594c44bbc4b871aefa1380eda1cdf5eedc66c2900f14d68b79fb0d3
@@ -61,4 +73,4 @@ entries:
     urls:
     - https://github.com/stenic/sql-operator/releases/download/sql-operator-0.1.1/sql-operator-0.1.1.tgz
     version: 0.1.1
-generated: "2021-10-23T22:04:13.148272257Z"
+generated: "2021-10-25T20:01:57.852127925Z"
