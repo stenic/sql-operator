@@ -29,4 +29,19 @@ subjects:
     name: {{ include "sql-operator.serviceAccountName" $ }}
     namespace: {{ $.Release.Namespace }}
 {{- end }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "sql-operator.fullname" $ }}-leader-election-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "sql-operator.fullname" $ }}-leader-election-role
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "sql-operator.serviceAccountName" $ }}
+    namespace: {{ $.Release.Namespace }}
+
 {{- end }}

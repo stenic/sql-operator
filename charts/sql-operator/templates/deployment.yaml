@@ -26,6 +26,7 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/admission-webhook.yaml: {{ include (print $.Template.BasePath "/webhook_admission.yaml") . | sha256sum }}
         prometheus.io/scrape: "true"
         {{- if .Values.annotations }}
         {{ toYaml .Values.annotations | nindent 8 }}
@@ -50,6 +51,7 @@ spec:
         {{- if .Values.watchNamespaces }}
         - --watch-namespaces={{- include "sql-operator.watchNamespaces" . -}}
         {{- end }}
+        - --leader-elect
         env:
           - name: POD_NAMESPACE
             valueFrom:
@@ -62,6 +64,10 @@ spec:
           {{- if .Values.envVars }}
           {{- toYaml .Values.envVars | nindent 10 }}
           {{- end }}
+        ports:
+          - containerPort: 9443
+            name: webhook
+            protocol: TCP
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
@@ -76,6 +82,10 @@ spec:
             port: 8081
           initialDelaySeconds: 5
           periodSeconds: 10
+        volumeMounts:
+        - name: webhook-cert
+          mountPath: /tmp/k8s-webhook-server/serving-certs
+          readOnly: true
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
       {{- if .Values.sidecarContainers }}
@@ -89,6 +99,11 @@ spec:
       affinity:
         {{ toYaml .Values.affinity | nindent 8 }}
       {{- end }}
+      volumes:
+      - name: webhook-cert
+        secret:
+          defaultMode: 420
+          secretName: {{ template "sql-operator.fullname" . }}-admission-webhook-keypair
       {{- if .Values.tolerations }}
       tolerations:
         {{ toYaml .Values.tolerations | nindent 8 }}

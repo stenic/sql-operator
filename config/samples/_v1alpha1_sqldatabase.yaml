@@ -3,7 +3,7 @@ kind: SqlDatabase
 metadata:
   name: sqldatabase-sample
 spec:
-  databaseName: test123
+  databaseName: test1234
   hostRef:
     name: sqlhost-sample
   cleanupPolicy: Delete
