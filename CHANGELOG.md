@@ -1,3 +1,16 @@
+# [1.3.0](https://github.com/stenic/sql-operator/compare/v1.2.4...v1.3.0) (2021-10-25)
+
+
+### Bug Fixes
+
+* Restore boilerplate location ([acd9337](https://github.com/stenic/sql-operator/commit/acd93372d059c0acfb12606b96553ac753568c4e))
+
+
+### Features
+
+* Make fields immutable [#7](https://github.com/stenic/sql-operator/issues/7) ([8c19f80](https://github.com/stenic/sql-operator/commit/8c19f802f125f5e50500a20d528929b6575cd982))
+* Validate datbasename [#6](https://github.com/stenic/sql-operator/issues/6) ([97431a0](https://github.com/stenic/sql-operator/commit/97431a015f1273cdcf7da0d1c41f012818ea26d4))
+
 ## [1.2.4](https://github.com/stenic/sql-operator/compare/v1.2.3...v1.2.4) (2021-10-23)
 
 
