@@ -42,6 +42,7 @@ HELM_DIRECTORY="${HELM_DIRECTORY:-charts}"
     | sed -E 's/^kind: ClusterRole$/kind: {{ include "sql-operator\.roleType" \$ }}/' \
     | sed -E 's/name: sql-operator-role$/name: {{ include "sql-operator\.fullname" \$ }}-role/'
   printf '\n{{- end }}\n\n---\n'
-  cat ${CONFIG_DIRECTORY}/rbac/leader_election_role.yaml
+  cat ${CONFIG_DIRECTORY}/rbac/leader_election_role.yaml \
+    | sed -E 's/name: leader-election-role$/name: {{ include "sql-operator\.fullname" \$ }}-leader-election-role/'
   printf '{{- end }}\n'
 } > "${HELM_DIRECTORY}/sql-operator/templates/role.yaml"
