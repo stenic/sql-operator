@@ -1,3 +1,11 @@
+## [1.3.1](https://github.com/stenic/sql-operator/compare/v1.3.0...v1.3.1) (2021-10-25)
+
+
+### Bug Fixes
+
+* **chart:** Fix missing role ([2a27690](https://github.com/stenic/sql-operator/commit/2a276905a661206571bf539779b7edbedde2c8a6))
+* **chart:** Fix missing role ([6dd7de5](https://github.com/stenic/sql-operator/commit/6dd7de5d54be4da56779e6a18983e391a738e212))
+
 # [1.3.0](https://github.com/stenic/sql-operator/compare/v1.2.4...v1.3.0) (2021-10-25)
 
 
