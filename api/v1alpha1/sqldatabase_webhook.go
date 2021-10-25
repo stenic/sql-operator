@@ -69,6 +69,14 @@ func (r *SqlDatabase) ValidateUpdate(old runtime.Object) error {
 	return r.validateDatabase(old)
 }
 
+// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
+func (r *SqlDatabase) ValidateDelete() error {
+	sqldatabaselog.Info("validate delete", "name", r.Name)
+
+	// TODO(user): fill in your validation logic upon object deletion.
+	return nil
+}
+
 func (r *SqlDatabase) validateDatabase(old runtime.Object) error {
 	var allErrs field.ErrorList
 	if err := r.validateDatabaseName(); err != nil {
@@ -113,13 +121,5 @@ func (r *SqlDatabase) validateDatabaseNameChanged(old runtime.Object) *field.Err
 		)
 	}
 
-	return nil
-}
-
-// ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *SqlDatabase) ValidateDelete() error {
-	sqldatabaselog.Info("validate delete", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
 }

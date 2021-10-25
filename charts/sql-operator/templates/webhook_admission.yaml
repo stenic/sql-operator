@@ -45,6 +45,28 @@ webhooks:
     resources:
     - sqldatabases
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    caBundle: {{ b64enc $ca.Cert }}
+    service:
+      name: {{ include "sql-operator.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+      path: /mutate-stenic-io-v1alpha1-sqluser
+  failurePolicy: Fail
+  name: mutating.sqluser.stenic.io
+  rules:
+  - apiGroups:
+    - stenic.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - sqlusers
+  sideEffects: None
 
 ---
 apiVersion: admissionregistration.k8s.io/v1
@@ -75,6 +97,29 @@ webhooks:
     resources:
     - sqldatabases
   sideEffects: None
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    caBundle: {{ b64enc $ca.Cert }}
+    service:
+      name: {{ include "sql-operator.fullname" . }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-stenic-io-v1alpha1-sqluser
+  failurePolicy: Fail
+  name: validating.sqluser.stenic.io
+  rules:
+  - apiGroups:
+    - stenic.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - sqlusers
+  sideEffects: None
+
 ---
 apiVersion: v1
 kind: Secret

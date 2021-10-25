@@ -85,6 +85,7 @@ check-generated: ## Ensure the generated code is up-to-date
 	rm -rf generated-check
 	mkdir -p generated-check
 	cp -r api generated-check/api
+	cp -r config generated-check/config
 	TMP_API_DIRECTORY="./generated-check/api/..." make generate
 	@echo "Check to make sure the generated code is up to date"
 	diff --recursive api generated-check/api
