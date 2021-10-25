@@ -51,7 +51,7 @@ The following tables list the configurable parameters of the sql-operator chart 
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/stenic/sql-operator"` |  |
-| image.tag | string | `"1.0.0"` |  |
+| image.tag | string | `"1.3.0"` |  |
 | labels | object | `{}` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
