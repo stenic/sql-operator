@@ -120,7 +120,12 @@ func main() {
 			setupLog.Error(err, "unable to create webhook", "webhook", "SqlDatabase")
 			os.Exit(1)
 		}
+		if err = (&steniciov1alpha1.SqlUser{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "SqlUser")
+			os.Exit(1)
+		}
 	}
+
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
