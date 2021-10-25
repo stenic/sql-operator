@@ -74,8 +74,3 @@ spec:
   cleanupPolicy: Delete
 ```
 
-## Roadmap
-
- - [ ] SqlDatabase - Seed database on create
- - [ ] Add a system to keep track of external resources owned by the operator
-
