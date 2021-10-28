@@ -30,6 +30,7 @@ fullnameOverride: ""
 # If empty, the sql operator will watch all namespaces in the cluster.
 watchNamespaces: ""
 
+
 rbac:
   # Specifies whether RBAC resources should be created
   create: true
