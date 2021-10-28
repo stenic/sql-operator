@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/stenic/sql-operator/compare/v1.3.1...v1.4.0) (2021-10-28)
+
+
+### Features
+
+* Add next for next release ([f21709f](https://github.com/stenic/sql-operator/commit/f21709fce7b608d643901c2616b4afbb33b95996))
+* No need for sqlHost on SqlGrant ([3e8c51b](https://github.com/stenic/sql-operator/commit/3e8c51bd5ab8104555bda132a7e97cb0bfe9be12))
+
 ## [1.3.1](https://github.com/stenic/sql-operator/compare/v1.3.0...v1.3.1) (2021-10-25)
 
 
