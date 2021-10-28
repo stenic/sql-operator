@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/stenic/sql-operator/compare/v1.4.0...v1.5.0) (2021-10-28)
+
+
+### Features
+
+* No next ([1a1fa31](https://github.com/stenic/sql-operator/commit/1a1fa31d8388069f80e3684ddbce4756157b615d))
+
 # [1.4.0](https://github.com/stenic/sql-operator/compare/v1.3.1...v1.4.0) (2021-10-28)
 
 
