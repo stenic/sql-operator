@@ -175,16 +175,6 @@ spec:
                 items:
                   type: string
                 type: array
-              hostRef:
-                description: Reference to the SqlHost
-                properties:
-                  name:
-                    description: Name of the SqlObject
-                    type: string
-                  namespace:
-                    description: Namespace of the SqlObject
-                    type: string
-                type: object
               userRef:
                 description: Reference to the SqlUser
                 properties:
@@ -198,7 +188,6 @@ spec:
             required:
             - databaseRef
             - grants
-            - hostRef
             - userRef
             type: object
           status:

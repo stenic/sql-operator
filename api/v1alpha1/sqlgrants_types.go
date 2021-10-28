@@ -25,9 +25,6 @@ import (
 
 // SqlGrantSpec defines the desired state of SqlGrant
 type SqlGrantSpec struct {
-	// Reference to the SqlHost
-	HostRef SqlObjectRef `json:"hostRef"`
-
 	// Reference to the SqlUser
 	UserRef SqlObjectRef `json:"userRef"`
 

@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -63,11 +64,6 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
-	var host steniciov1alpha1.SqlHost
-	if err := r.Get(ctx, getNamespacedName(grants.Spec.HostRef, grants.Namespace), &host); err != nil {
-		log.Error(err, "unable to find SqlHost for "+grants.Name)
-		return scheduledResult, client.IgnoreNotFound(err)
-	}
 	var user steniciov1alpha1.SqlUser
 	if err := r.Get(ctx, getNamespacedName(grants.Spec.UserRef, grants.Namespace), &user); err != nil {
 		log.Error(err, "unable to find SqlUser for "+grants.Name)
@@ -76,6 +72,17 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	var database steniciov1alpha1.SqlDatabase
 	if err := r.Get(ctx, getNamespacedName(grants.Spec.DatabaseRef, grants.Namespace), &database); err != nil {
 		log.Error(err, "unable to find SqlDatabase for "+grants.Name)
+		return scheduledResult, client.IgnoreNotFound(err)
+	}
+	var host steniciov1alpha1.SqlHost
+	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, database.Spec.HostRef.Namespace), &host); err != nil {
+		log.Error(err, "unable to find SqlHost for "+grants.Name)
+		return scheduledResult, client.IgnoreNotFound(err)
+	}
+
+	if getNamespacedName(database.Spec.HostRef, database.Spec.HostRef.Namespace) != getNamespacedName(user.Spec.HostRef, user.Spec.HostRef.Namespace) {
+		err := fmt.Errorf("SqlDatabase and SqlUser don't share the same SqlHost")
+		log.Error(err, "unable to find SqlHost for "+grants.Name)
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
 
