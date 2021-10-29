@@ -35,8 +35,6 @@ func (r *SqlUser) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-stenic-io-v1alpha1-sqluser,mutating=true,failurePolicy=fail,sideEffects=None,groups=stenic.io,resources=sqlusers,verbs=create;update,versions=v1alpha1,name=msqluser.kb.io,admissionReviewVersions={v1,v1beta1}
 
 var _ webhook.Defaulter = &SqlUser{}
@@ -48,7 +46,6 @@ func (r *SqlUser) Default() {
 	// TODO(user): fill in your defaulting logic.
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-stenic-io-v1alpha1-sqluser,mutating=false,failurePolicy=fail,sideEffects=None,groups=stenic.io,resources=sqlusers,verbs=create;update,versions=v1alpha1,name=vsqluser.kb.io,admissionReviewVersions={v1,v1beta1}
 
 var _ webhook.Validator = &SqlUser{}
@@ -75,6 +72,7 @@ func (r *SqlUser) ValidateDelete() error {
 	return nil
 }
 
+// validateUser runs all checks to validate the object
 func (r *SqlUser) validateUser(old runtime.Object) error {
 	var allErrs field.ErrorList
 
@@ -92,6 +90,7 @@ func (r *SqlUser) validateUser(old runtime.Object) error {
 		r.Name, allErrs)
 }
 
+// validateUsernameChanged ensures the username can't be changed
 func (r *SqlUser) validateUsernameChanged(old runtime.Object) *field.Error {
 	oldDb := old.(*SqlUser)
 
