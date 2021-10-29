@@ -1,3 +1,10 @@
+## [1.5.5](https://github.com/stenic/sql-operator/compare/v1.5.4...v1.5.5) (2021-10-29)
+
+
+### Bug Fixes
+
+* Minor code improvements ([88f9a88](https://github.com/stenic/sql-operator/commit/88f9a884058f04612e728e6f08c2d145a4476df0))
+
 ## [1.5.4](https://github.com/stenic/sql-operator/compare/v1.5.3...v1.5.4) (2021-10-29)
 
 
