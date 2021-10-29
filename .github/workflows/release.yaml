@@ -11,4 +11,4 @@ jobs:
     with:
       docker_image: "ghcr.io/${{ github.repository }}"
     secrets:
-      token: ${{ secrets.GH_TOKEN }}
+      token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
