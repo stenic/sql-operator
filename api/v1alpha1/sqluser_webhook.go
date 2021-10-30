@@ -42,8 +42,6 @@ var _ webhook.Defaulter = &SqlUser{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (r *SqlUser) Default() {
 	sqluserlog.Info("default", "name", r.Name)
-
-	// TODO(user): fill in your defaulting logic.
 }
 
 //+kubebuilder:webhook:path=/validate-stenic-io-v1alpha1-sqluser,mutating=false,failurePolicy=fail,sideEffects=None,groups=stenic.io,resources=sqlusers,verbs=create;update,versions=v1alpha1,name=vsqluser.kb.io,admissionReviewVersions={v1,v1beta1}
