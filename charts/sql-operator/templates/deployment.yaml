@@ -51,7 +51,6 @@ spec:
         {{- if .Values.watchNamespaces }}
         - --watch-namespaces={{- include "sql-operator.watchNamespaces" . -}}
         {{- end }}
-        - --leader-elect
         env:
           - name: POD_NAMESPACE
             valueFrom:
