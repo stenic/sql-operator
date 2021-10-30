@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.9](https://github.com/stenic/sql-operator/compare/v1.5.8...v1.5.9) (2021-10-30)
+
+
+### Bug Fixes
+
+* **chart:** Handle appVersion from chart ([3246146](https://github.com/stenic/sql-operator/commit/3246146ac60599891130726892e325503cc11085))
+
 ## [1.5.8](https://github.com/stenic/sql-operator/compare/v1.5.7...v1.5.8) (2021-10-30)
 
 
