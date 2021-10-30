@@ -60,8 +60,6 @@ kind: SqlGrant
 metadata:
   name: sqlgrants-sample
 spec:
-  hostRef:
-    name: sqlhost-sample
   userRef:
     name: sqluser-sample
   databaseRef:
