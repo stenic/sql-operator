@@ -1,3 +1,17 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [1.5.7](https://github.com/stenic/sql-operator/compare/v1.5.6...v1.5.7) (2021-10-30)
+
+
+### Bug Fixes
+
+* **ci:** Correct chart location ([d18accf](https://github.com/stenic/sql-operator/commit/d18accf88fba0f0448d41373c2cce8723a20cdda))
+* **ci:** Remove config ([749a560](https://github.com/stenic/sql-operator/commit/749a560acf2d6145aa5ed84f83d62c2af7b5b7d5))
+* Minor code improvements ([2fc9efc](https://github.com/stenic/sql-operator/commit/2fc9efcbd81b3882c31570e51d90d4f401419eb3))
+
 ## [1.5.6](https://github.com/stenic/sql-operator/compare/v1.5.5...v1.5.6) (2021-10-30)
 
 
