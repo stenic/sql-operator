@@ -115,7 +115,7 @@ func (d *MySqlDriver) DeleteDatabase(ctx context.Context, database steniciov1alp
 	defer db.Close()
 
 	// Delete the database
-	if _, err := db.QueryContext(ctx, fmt.Sprintf(
+	if _, err := db.ExecContext(ctx, fmt.Sprintf(
 		"DROP DATABASE IF EXISTS %s;",
 		database.Spec.DatabaseName,
 	)); err != nil {
