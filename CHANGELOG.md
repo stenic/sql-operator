@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.11](https://github.com/stenic/sql-operator/compare/v1.5.10...v1.5.11) (2021-10-30)
+
+
+### Bug Fixes
+
+* **mysql:** Use exec instead of query if possible ([ddfe3f1](https://github.com/stenic/sql-operator/commit/ddfe3f14e0ae43cb52f7b1fa8303840c26f30402))
+
 ## [1.5.10](https://github.com/stenic/sql-operator/compare/v1.5.9...v1.5.10) (2021-10-30)
 
 
