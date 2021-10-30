@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.10](https://github.com/stenic/sql-operator/compare/v1.5.9...v1.5.10) (2021-10-30)
+
+
+### Bug Fixes
+
+* **chart:** No leader-elect ([e78b137](https://github.com/stenic/sql-operator/commit/e78b1375847bc799f30951bde6b87e4fd24e254b))
+
 ## [1.5.9](https://github.com/stenic/sql-operator/compare/v1.5.8...v1.5.9) (2021-10-30)
 
 
