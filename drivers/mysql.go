@@ -29,6 +29,8 @@ func (d *MySqlDriver) connect() (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err == nil {
 		db.SetConnMaxLifetime(time.Minute * 1)
+		db.SetMaxIdleConns(0)
+		db.SetMaxOpenConns(5)
 	}
 	return db, err
 }
