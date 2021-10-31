@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.15](https://github.com/stenic/sql-operator/compare/v1.5.14...v1.5.15) (2021-10-31)
+
+
+### Bug Fixes
+
+* **deps:** Patch github.com/onsi/ginkgo ([3b4d5a3](https://github.com/stenic/sql-operator/commit/3b4d5a33aa77359285cde1554359529f2888043a))
+* **deps:** Patch github.com/onsi/gomega ([d076abb](https://github.com/stenic/sql-operator/commit/d076abbee13a11260edd882e6b33a32a7bb25048))
+* **deps:** Patch k8s.io ([29df11f](https://github.com/stenic/sql-operator/commit/29df11f8748963c7076b48bc55c27de40a83ac22))
+
 ## [1.5.14](https://github.com/stenic/sql-operator/compare/v1.5.13...v1.5.14) (2021-10-31)
 
 
