@@ -1,9 +1,9 @@
 apiVersion: v2
 name: sql-operator
 description: Manage your Sql servers
-version: 0.3.6
+version: 0.3.7
 maintainers:
   - name: NoUseFreak
     email: dries@stenic.io
     url: https://stenic.io
-appVersion: 1.5.12
+appVersion: 1.5.13

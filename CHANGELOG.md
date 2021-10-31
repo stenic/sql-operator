@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.13](https://github.com/stenic/sql-operator/compare/v1.5.12...v1.5.13) (2021-10-31)
+
+
+### Reverts
+
+* Revert "chore(deps): Update vulnerable dependecies" ([b229129](https://github.com/stenic/sql-operator/commit/b229129711515e8ab446a342de58e97751a1e6a9))
+* Revert "chore(deps): update golang docker tag to v1.17" ([8928d75](https://github.com/stenic/sql-operator/commit/8928d759fabf49083940c595e5ff2ffcd54a1b2f))
+
 ## [1.5.12](https://github.com/stenic/sql-operator/compare/v1.5.11...v1.5.12) (2021-10-30)
 
 
