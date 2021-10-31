@@ -26,3 +26,4 @@ testbin/*
 
 # Directory to test generated files
 generated-check
+vendor
