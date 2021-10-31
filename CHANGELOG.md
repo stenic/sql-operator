@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.14](https://github.com/stenic/sql-operator/compare/v1.5.13...v1.5.14) (2021-10-31)
+
+
+### Bug Fixes
+
+* Add status badge ([e83d684](https://github.com/stenic/sql-operator/commit/e83d684c4743c0c1922b1856a68cbfd953105804))
+
 ## [1.5.13](https://github.com/stenic/sql-operator/compare/v1.5.12...v1.5.13) (2021-10-31)
 
 
