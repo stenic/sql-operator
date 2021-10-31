@@ -66,7 +66,6 @@ func (r *SqlUser) ValidateUpdate(old runtime.Object) error {
 func (r *SqlUser) ValidateDelete() error {
 	sqluserlog.Info("validate delete", "name", r.Name)
 
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
 }
 
