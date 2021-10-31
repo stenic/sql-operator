@@ -82,13 +82,15 @@ func main() {
 	}
 
 	refreshRateVal := time.Duration(refreshRate) * time.Second
+	initControllerErr := "unable to create controller"
+	initWebhookErr := "unable to create webhook"
 
 	if err = (&controllers.SqlUserReconciler{
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SqlUser")
+		setupLog.Error(err, initControllerErr, "controller", "SqlUser")
 		os.Exit(1)
 	}
 	if err = (&controllers.SqlDatabaseReconciler{
@@ -96,7 +98,7 @@ func main() {
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SqlDatabase")
+		setupLog.Error(err, initControllerErr, "controller", "SqlDatabase")
 		os.Exit(1)
 	}
 	if err = (&controllers.SqlHostReconciler{
@@ -104,7 +106,7 @@ func main() {
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SqlHost")
+		setupLog.Error(err, initControllerErr, "controller", "SqlHost")
 		os.Exit(1)
 	}
 	if err = (&controllers.SqlGrantReconciler{
@@ -112,16 +114,16 @@ func main() {
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SqlGrant")
+		setupLog.Error(err, initControllerErr, "controller", "SqlGrant")
 		os.Exit(1)
 	}
 	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
 		if err = (&steniciov1alpha1.SqlDatabase{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "SqlDatabase")
+			setupLog.Error(err, initWebhookErr, "webhook", "SqlDatabase")
 			os.Exit(1)
 		}
 		if err = (&steniciov1alpha1.SqlUser{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "SqlUser")
+			setupLog.Error(err, initWebhookErr, "webhook", "SqlUser")
 			os.Exit(1)
 		}
 	}
