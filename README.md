@@ -1,5 +1,8 @@
 # SqlOperator
 
+[![Last release](https://github.com/stenic/sql-operator/actions/workflows/release.yaml/badge.svg)](https://github.com/stenic/sql-operator/actions/workflows/release.yaml)
+
+
 Operate sql databases, users and grants.
 
 > This is a WIP project and should not at all be used in production at this time.
