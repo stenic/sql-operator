@@ -9,7 +9,7 @@ require (
 	github.com/onsi/gomega v1.10.2
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	k8s.io/api v0.20.2
-	k8s.io/apimachinery v0.20.2
+	k8s.io/apimachinery v0.22.3
 	k8s.io/client-go v0.20.2
 	sigs.k8s.io/controller-runtime v0.8.3
 )
