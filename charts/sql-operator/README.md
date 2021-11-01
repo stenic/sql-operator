@@ -45,25 +45,23 @@ The following tables list the configurable parameters of the sql-operator chart 
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| annotations | object | `{}` |  |
-| envVars | list | `[]` |  |
-| fullnameOverride | string | `""` |  |
+| affinity | object | `{}` | Affinity and anti-affinity |
+| annotations | object | `{}` | Additional annotations for the controller pods. |
+| envVars | list | `[]` | Additional environment variables for the controller. |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/stenic/sql-operator"` |  |
 | image.tag | string | `""` |  |
-| labels | object | `{}` |  |
-| nameOverride | string | `""` |  |
-| nodeSelector | object | `{}` |  |
-| priorityClassName | string | `""` |  |
-| rbac.create | bool | `true` |  |
+| labels | object | `{}` | Additional labels for the controller pods. |
+| nodeSelector | object | `{"kubernetes.io/os":"linux"}` | Node labels for controller pod assignment |
+| priorityClassName | string | `""` | Provide a priority class name to the controller pods |
+| rbac.create | bool | `true` | Specifies whether RBAC resources should be created |
 | replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  Required if create is false. If not set and create is true, a name is generated using the fullname template |
-| sidecarContainers | list | `[]` |  |
-| tolerations | list | `[]` |  |
-| watchNamespaces | string | `""` |  If empty, the sql operator will watch all namespaces in the cluster. |
+| resources | object | `{}` | Resource requests and limits for the controller |
+| serviceAccount.create | bool | `true` | Specifies whether a ServiceAccount should be created |
+| serviceAccount.name | string | `""` | The name of the ServiceAccount to use. Required if create is false. If not set and create is true, a name is generated using the fullname template |
+| sidecarContainers | list | `[]` | Additional containers to be added to the controller pod. |
+| tolerations | list | `[]` | Node tolerations for server scheduling to nodes with taints |
+| watchNamespaces | string | `""` | A comma-separated list of namespaces that the operator should watch. If empty, the sql operator will watch all namespaces in the cluster. |
 
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 

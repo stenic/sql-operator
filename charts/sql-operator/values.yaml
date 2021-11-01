@@ -16,40 +16,65 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+## Overrides for generated resource names
+# See templates/_helpers.tpl
+# nameOverride:
+# fullnameOverride:
 
 image:
   repository: ghcr.io/stenic/sql-operator
-  # Overrides the image tag whose default is the chart appVersion.
   tag: ""
   pullPolicy: IfNotPresent
 
-nameOverride: ""
-fullnameOverride: ""
+replicaCount: 1
 
-# A comma-separated list of namespaces that the operator should watch.
+# watchNamespaces -- A comma-separated list of namespaces that the operator should watch.
 # If empty, the sql operator will watch all namespaces in the cluster.
 watchNamespaces: ""
 
 rbac:
-  # Specifies whether RBAC resources should be created
+  # rbac.create -- Specifies whether RBAC resources should be created
   create: true
 
 serviceAccount:
-  # Specifies whether a ServiceAccount should be created
+  # serviceAccount.create -- Specifies whether a ServiceAccount should be created
   create: true
-  # The name of the ServiceAccount to use.
+
+  # serviceAccount.name -- The name of the ServiceAccount to use.
   # Required if create is false.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-# Various Pod Options to customize the runtime of the operator
+# resources -- Resource requests and limits for the controller
 resources: {}
+  # limits:
+  #   cpu: 50m
+  #   memory: 50Mi
+  # requests:
+  #   cpu: 50m
+  #   memory: 50Mi
+
+# envVars -- Additional environment variables for the controller.
 envVars: []
+
+# labels -- Additional labels for the controller pods.
 labels: {}
+
+# annotations -- Additional annotations for the controller pods.
 annotations: {}
-nodeSelector: {}
+
+# nodeSelector -- Node labels for controller pod assignment
+nodeSelector:
+  kubernetes.io/os: linux
+
+# affinity -- Affinity and anti-affinity
 affinity: {}
+
+# tolerations -- Node tolerations for server scheduling to nodes with taints
 tolerations: []
+
+# priorityClassName -- Provide a priority class name to the controller pods
 priorityClassName: ""
+
+# sidecarContainers -- Additional containers to be added to the controller pod.
 sidecarContainers: []
