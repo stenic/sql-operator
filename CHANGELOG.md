@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.16](https://github.com/stenic/sql-operator/compare/v1.5.15...v1.5.16) (2021-11-01)
+
+
+### Bug Fixes
+
+* Correct prometheus scrape port ([989b1f8](https://github.com/stenic/sql-operator/commit/989b1f87ac58ef4375427a5a63f290971962a969))
+
 ## [1.5.15](https://github.com/stenic/sql-operator/compare/v1.5.14...v1.5.15) (2021-10-31)
 
 
