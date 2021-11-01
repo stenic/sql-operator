@@ -20,6 +20,7 @@ metadata:
     control-plane: sql-operator
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
       control-plane: sql-operator
