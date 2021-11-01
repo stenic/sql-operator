@@ -1,6 +1,7 @@
 # SqlOperator
 
 [![Last release](https://github.com/stenic/sql-operator/actions/workflows/release.yaml/badge.svg)](https://github.com/stenic/sql-operator/actions/workflows/release.yaml)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/sql-operator)](https://artifacthub.io/packages/search?repo=sql-operator)
 
 
 Operate sql databases, users and grants.
