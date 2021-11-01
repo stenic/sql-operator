@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.18](https://github.com/stenic/sql-operator/compare/v1.5.17...v1.5.18) (2021-11-01)
+
+
+### Bug Fixes
+
+* Correct webhook naming ([dc35b32](https://github.com/stenic/sql-operator/commit/dc35b32008c8ef69ca9f6e14632a0f0a224a2dee))
+
 ## [1.5.17](https://github.com/stenic/sql-operator/compare/v1.5.16...v1.5.17) (2021-11-01)
 
 
