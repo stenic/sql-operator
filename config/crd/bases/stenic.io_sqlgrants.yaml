@@ -17,10 +17,6 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - description: Name of the host
-      jsonPath: .spec.hostRef.name
-      name: Host
-      type: string
     - description: Name of the user
       jsonPath: .spec.userRef.name
       name: User

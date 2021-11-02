@@ -58,7 +58,6 @@ type SqlGrantStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:printcolumn:name="Host",type="string",JSONPath=".spec.hostRef.name",description="Name of the host"
 //+kubebuilder:printcolumn:name="User",type="string",JSONPath=".spec.userRef.name",description="Name of the user"
 //+kubebuilder:printcolumn:name="Database",type="string",JSONPath=".spec.databaseRef.name",description="Name of the database"
 //+kubebuilder:printcolumn:name="Age",type="date",JSONPath=".metadata.creationTimestamp"
