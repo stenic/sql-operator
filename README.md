@@ -20,15 +20,15 @@ Currenty, only MySQL is supported.
 The `SqlHost` object contains information how the operator should connect to the remote server. 
 Note that this information should be protected using rbac.
 
-## SqlDatabase
+### SqlDatabase
 
 The `SqlDatabase` object manages a database on the referenced `SqlHost`.
 
-## SqlUser
+### SqlUser
 
 The `SqlUser` object manages a user on the referenced `SqlHost`.
 
-## SqlGrant
+### SqlGrant
 
 The `SqlGrant` object manages the grant for the referenced `SqlUser` on the referenced `SqlDatabase`.
 
