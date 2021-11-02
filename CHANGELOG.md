@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.19](https://github.com/stenic/sql-operator/compare/v1.5.18...v1.5.19) (2021-11-02)
+
+
+### Bug Fixes
+
+* Remove host column from SqlGrant list ([deac535](https://github.com/stenic/sql-operator/commit/deac535709fcd5162a4db0df4ed5b006382f8184))
+
 ## [1.5.18](https://github.com/stenic/sql-operator/compare/v1.5.17...v1.5.18) (2021-11-01)
 
 
