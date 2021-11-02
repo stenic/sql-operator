@@ -9,9 +9,17 @@ Operate sql databases, users and grants.
 > This is a WIP project and should not at all be used in production at this time.
 > Feel free to validate in CI pipelines.
 
-# Engines
+## Engines
 
 Currenty, only MySQL is supported.
+
+## Installation
+
+```shell
+kubectl create namespace sql-operator
+helm repo add sql-operator https://stenic.github.io/sql-operator/
+helm install sql-operator --namespace sql-operator sql-operator/sql-operator
+```
 
 ## Objects
 
