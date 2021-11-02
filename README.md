@@ -13,7 +13,29 @@ Operate sql databases, users and grants.
 
 Currenty, only MySQL is supported.
 
+## Objects
+
+### SqlHost
+
+The `SqlHost` object contains information how the operator should connect to the remote server. 
+Note that this information should be protected using rbac.
+
+## SqlDatabase
+
+The `SqlDatabase` object manages a database on the referenced `SqlHost`.
+
+## SqlUser
+
+The `SqlUser` object manages a user on the referenced `SqlHost`.
+
+## SqlGrant
+
+The `SqlGrant` object manages the grant for the referenced `SqlUser` on the referenced `SqlDatabase`.
+
 ## Example
+
+The following example registeres a `SqlHost` pointing to a shared integration host and creates a `database`,
+`user` and `grants` to run integration tests for the application.
 
 ```yaml
 ---
@@ -21,7 +43,7 @@ Currenty, only MySQL is supported.
 apiVersion: stenic.io/v1alpha1
 kind: SqlHost
 metadata:
-  name: sqlhost-sample
+  name: integration
 spec:
   engine: Mysql
   endpoint:
@@ -36,11 +58,11 @@ spec:
 apiVersion: stenic.io/v1alpha1
 kind: SqlDatabase
 metadata:
-  name: sqldatabase-sample
+  name: application-int-db
 spec:
-  databaseName: test123
+  databaseName: myapp_testing
   hostRef:
-    name: sqlhost-sample
+    name: integration
   cleanupPolicy: Delete
 
 ---
@@ -48,13 +70,13 @@ spec:
 apiVersion: stenic.io/v1alpha1
 kind: SqlUser
 metadata:
-  name: sqluser-sample
+  name: application-int-user
 spec:
   credentials:
-    username: sqloperator_tst
-    password: sqloperator_tst
+    username: myapp_username
+    password: myapp_password
   hostRef:
-    name: sqlhost-sample
+    name: integration
   cleanupPolicy: Delete
 
 ---
@@ -62,12 +84,12 @@ spec:
 apiVersion: stenic.io/v1alpha1
 kind: SqlGrant
 metadata:
-  name: sqlgrants-sample
+  name: application-int-grant
 spec:
   userRef:
-    name: sqluser-sample
+    name: application-int-user
   databaseRef:
-    name: sqldatabase-sample
+    name: application-int-db
   grants:
     - INSERT
     - SELECT
@@ -75,4 +97,3 @@ spec:
     - DELETE
   cleanupPolicy: Delete
 ```
-
