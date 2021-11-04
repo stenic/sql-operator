@@ -1,0 +1,29 @@
+name: Github Pages
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+
+      - run: pip install mkdocs==1.0.4 mkdocs_material==4.1.1
+      - run: mkdocs build
+
+      - uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/master' }}
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./site
+          keep_files: true
+          
