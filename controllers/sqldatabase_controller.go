@@ -18,10 +18,12 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -34,7 +36,8 @@ import (
 // SqlDatabaseReconciler reconciles a SqlDatabase object
 type SqlDatabaseReconciler struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme   *runtime.Scheme
+	Recorder record.EventRecorder
 
 	RefreshRate time.Duration
 }
@@ -43,6 +46,7 @@ type SqlDatabaseReconciler struct {
 //+kubebuilder:rbac:groups=stenic.io,resources=sqldatabases/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=stenic.io,resources=sqldatabases/finalizers,verbs=update
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlhosts,verbs=get;list;watch
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -61,6 +65,7 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, database.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+database.Name)
+		r.Recorder.Event(&database, "Warning", "Error", "unable to find SqlHost")
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -122,9 +127,13 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
-	if err = driver.UpsertDatabase(ctx, database); err != nil {
+	count, err := driver.UpsertDatabase(ctx, database)
+	if err != nil {
 		log.Error(err, "failed to create SqlDatabase")
 		return ctrl.Result{}, err
+	}
+	if count > 0 {
+		r.Recorder.Event(&database, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
 	}
 
 	return scheduledResult, nil

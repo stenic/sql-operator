@@ -21,10 +21,10 @@ func GetDriver(host steniciov1alpha1.SqlHost) (Driver, error) {
 }
 
 type Driver interface {
-	UpsertUser(context.Context, steniciov1alpha1.SqlUser) error
+	UpsertUser(context.Context, steniciov1alpha1.SqlUser) (int64, error)
 	DeleteUser(context.Context, steniciov1alpha1.SqlUser) error
-	UpsertDatabase(context.Context, steniciov1alpha1.SqlDatabase) error
+	UpsertDatabase(context.Context, steniciov1alpha1.SqlDatabase) (int64, error)
 	DeleteDatabase(context.Context, steniciov1alpha1.SqlDatabase) error
-	UpsertGrants(context.Context, steniciov1alpha1.SqlGrant, steniciov1alpha1.SqlUser, steniciov1alpha1.SqlDatabase) error
+	UpsertGrants(context.Context, steniciov1alpha1.SqlGrant, steniciov1alpha1.SqlUser, steniciov1alpha1.SqlDatabase) (int64, error)
 	DeleteGrants(context.Context, steniciov1alpha1.SqlGrant, steniciov1alpha1.SqlUser, steniciov1alpha1.SqlDatabase) error
 }
