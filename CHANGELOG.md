@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/stenic/sql-operator/compare/v1.5.19...v1.6.0) (2021-11-04)
+
+
+### Features
+
+* Add events to objects ([5c970f9](https://github.com/stenic/sql-operator/commit/5c970f9a047f5fadda693150c057377bfc9f1bd2))
+
 ## [1.5.19](https://github.com/stenic/sql-operator/compare/v1.5.18...v1.5.19) (2021-11-02)
 
 
