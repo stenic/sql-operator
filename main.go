@@ -89,6 +89,7 @@ func main() {
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
+		Recorder:    mgr.GetEventRecorderFor("sql-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, initControllerErr, "controller", "SqlUser")
 		os.Exit(1)
@@ -97,6 +98,7 @@ func main() {
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
+		Recorder:    mgr.GetEventRecorderFor("sql-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, initControllerErr, "controller", "SqlDatabase")
 		os.Exit(1)
@@ -105,6 +107,7 @@ func main() {
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
+		Recorder:    mgr.GetEventRecorderFor("sql-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, initControllerErr, "controller", "SqlHost")
 		os.Exit(1)
@@ -113,6 +116,7 @@ func main() {
 		Client:      mgr.GetClient(),
 		Scheme:      mgr.GetScheme(),
 		RefreshRate: refreshRateVal,
+		Recorder:    mgr.GetEventRecorderFor("sql-operator"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, initControllerErr, "controller", "SqlGrant")
 		os.Exit(1)

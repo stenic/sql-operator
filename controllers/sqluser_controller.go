@@ -18,10 +18,12 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/stenic/sql-operator/drivers"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -36,6 +38,7 @@ type SqlUserReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
+	Recorder    record.EventRecorder
 	RefreshRate time.Duration
 }
 
@@ -43,6 +46,7 @@ type SqlUserReconciler struct {
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlusers/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlusers/finalizers,verbs=update
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlhosts,verbs=get;list;watch
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -58,6 +62,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, getNamespacedName(user.Spec.HostRef, user.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+user.Name)
+		r.Recorder.Event(&user, "Warning", "Error", "unable to find SqlHost")
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -118,10 +123,13 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		log.Error(err, "unable to update SqlUser status")
 		return ctrl.Result{}, err
 	}
-
-	if err = driver.UpsertUser(ctx, user); err != nil {
+	count, err := driver.UpsertUser(ctx, user)
+	if err != nil {
 		log.Error(err, "failed to create SqlUser")
 		return ctrl.Result{}, err
+	}
+	if count > 0 {
+		r.Recorder.Event(&user, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
 	}
 
 	return scheduledResult, nil

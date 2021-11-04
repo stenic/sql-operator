@@ -7,6 +7,13 @@ metadata:
   name: sql-operator-role
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
   - stenic.io
   resources:
   - sqldatabases

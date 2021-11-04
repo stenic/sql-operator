@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -33,12 +34,14 @@ type SqlHostReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
+	Recorder    record.EventRecorder
 	RefreshRate time.Duration
 }
 
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlhosts,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlhosts/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlhosts/finalizers,verbs=update
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.

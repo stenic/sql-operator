@@ -23,6 +23,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -37,12 +38,14 @@ type SqlGrantReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 
+	Recorder    record.EventRecorder
 	RefreshRate time.Duration
 }
 
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlgrants,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlgrants/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=stenic.io,resources=sqlgrants/finalizers,verbs=update
+//+kubebuilder:rbac:groups="",resources=events,verbs=create;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -68,16 +71,19 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	var database steniciov1alpha1.SqlDatabase
 	if err := r.Get(ctx, getNamespacedName(grants.Spec.DatabaseRef, grants.Namespace), &database); err != nil {
 		log.Error(err, "unable to find SqlDatabase for "+grants.Name)
+		r.Recorder.Event(&grants, "Warning", "Error", "unable to find SqlDatabase")
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, database.Spec.HostRef.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
+		r.Recorder.Event(&grants, "Warning", "Error", "unable to find SqlHost")
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
 
 	if getNamespacedName(database.Spec.HostRef, database.Spec.HostRef.Namespace) != getNamespacedName(user.Spec.HostRef, user.Spec.HostRef.Namespace) {
 		err := fmt.Errorf("SqlDatabase and SqlUser don't share the same SqlHost")
+		r.Recorder.Event(&grants, "Warning", "Error", err.Error())
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
@@ -142,9 +148,13 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, err
 	}
 
-	if err = driver.UpsertGrants(ctx, grants, user, database); err != nil {
+	count, err := driver.UpsertGrants(ctx, grants, user, database)
+	if err != nil {
 		log.Error(err, "failed to create SqlGrant")
 		return ctrl.Result{}, err
+	}
+	if count > 0 {
+		r.Recorder.Event(&grants, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
 	}
 
 	grants.Status.CurrentGrants = grants.Spec.Grants

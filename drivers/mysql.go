@@ -35,33 +35,36 @@ func (d *MySqlDriver) connect() (*sql.DB, error) {
 	return db, err
 }
 
-func (d *MySqlDriver) UpsertUser(ctx context.Context, user steniciov1alpha1.SqlUser) error {
+func (d *MySqlDriver) UpsertUser(ctx context.Context, user steniciov1alpha1.SqlUser) (int64, error) {
 	log := log.FromContext(ctx)
 	db, err := d.connect()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer db.Close()
 
 	// Try to alter user first
-	if _, err := db.ExecContext(ctx, fmt.Sprintf(
+	res, err := db.ExecContext(ctx, fmt.Sprintf(
 		"ALTER USER '%s'@'%%' IDENTIFIED BY '%s';",
 		user.Spec.Credentials.Username,
 		user.Spec.Credentials.Password,
-	)); err != nil {
+	))
+	if err != nil {
 		// User may not exist, try to create it
-		if _, err := db.ExecContext(ctx, fmt.Sprintf(
+		res, err = db.ExecContext(ctx, fmt.Sprintf(
 			"CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';",
 			user.Spec.Credentials.Username,
 			user.Spec.Credentials.Password,
-		)); err != nil {
-			return err
+		))
+		if err != nil {
+			return 0, err
 		}
 	}
 
+	rowCount, _ := res.RowsAffected()
 	log.V(1).Info("UPSERT USER")
 
-	return nil
+	return rowCount, nil
 }
 
 func (d *MySqlDriver) DeleteUser(ctx context.Context, user steniciov1alpha1.SqlUser) error {
@@ -86,25 +89,27 @@ func (d *MySqlDriver) DeleteUser(ctx context.Context, user steniciov1alpha1.SqlU
 	return nil
 }
 
-func (d *MySqlDriver) UpsertDatabase(ctx context.Context, database steniciov1alpha1.SqlDatabase) error {
+func (d *MySqlDriver) UpsertDatabase(ctx context.Context, database steniciov1alpha1.SqlDatabase) (int64, error) {
 	log := log.FromContext(ctx)
 	db, err := d.connect()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer db.Close()
 
 	// Create database
-	if _, err := db.ExecContext(ctx, fmt.Sprintf(
+	res, err := db.ExecContext(ctx, fmt.Sprintf(
 		"CREATE DATABASE IF NOT EXISTS %s;",
 		database.Spec.DatabaseName,
-	)); err != nil {
-		return err
+	))
+	if err != nil {
+		return 0, err
 	}
 
+	rowsCount, _ := res.RowsAffected()
 	log.V(1).Info("UPSERT DATABASE")
 
-	return nil
+	return rowsCount, nil
 }
 
 func (d *MySqlDriver) DeleteDatabase(ctx context.Context, database steniciov1alpha1.SqlDatabase) error {
@@ -129,18 +134,18 @@ func (d *MySqlDriver) DeleteDatabase(ctx context.Context, database steniciov1alp
 	return nil
 }
 
-func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.SqlGrant, user steniciov1alpha1.SqlUser, database steniciov1alpha1.SqlDatabase) error {
+func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.SqlGrant, user steniciov1alpha1.SqlUser, database steniciov1alpha1.SqlDatabase) (int64, error) {
 	log := log.FromContext(ctx)
 	db, err := d.connect()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer db.Close()
 
 	grantsQuery := fmt.Sprintf("SHOW GRANTS FOR '%s'@'%%';", user.Spec.Credentials.Username)
 	results, err := db.QueryContext(ctx, grantsQuery)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer results.Close()
 
@@ -153,7 +158,7 @@ func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.
 	for results.Next() {
 		var data string
 		if err = results.Scan(&data); err != nil {
-			return err
+			return 0, err
 		}
 		if r.MatchString(data) {
 			currentGrants = append(currentGrants, strings.Split(r.FindStringSubmatch(data)[1], ", ")...)
@@ -190,17 +195,18 @@ func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.
 		}
 	}
 
+	changeCount := int64(len(toGrant) + len(toRevoke))
 	// Flush when something changed
-	if len(toGrant)+len(toRevoke) > 0 {
+	if changeCount > 0 {
 		if _, err := db.ExecContext(ctx, "FLUSH PRIVILEGES"); err != nil {
-			return fmt.Errorf("%v: %v", "Failed to flush", err)
+			return changeCount, fmt.Errorf("%v: %v", "Failed to flush", err)
 		}
 	}
 
 	log.V(1).Info("UPSERT GRANTS")
 
 	// err may have been set by a failed grant/revoke call caused by missing permission on the SqlHost.
-	return err
+	return changeCount, err
 }
 
 func pp(a []string) string {
