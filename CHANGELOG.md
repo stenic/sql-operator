@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/stenic/sql-operator/compare/v1.7.0...v1.8.0) (2021-11-05)
+
+
+### Features
+
+* Disable webhooks ([9c56acc](https://github.com/stenic/sql-operator/commit/9c56acc4bbe9e75bc340c2f834465dd8d44c39e4))
+
 # [1.7.0](https://github.com/stenic/sql-operator/compare/v1.6.3...v1.7.0) (2021-11-05)
 
 
