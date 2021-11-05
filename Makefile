@@ -121,7 +121,7 @@ build: generate fmt vet ## Build manager binary.
 	go build -o bin/manager main.go
 
 run: manifests generate ## Run a controller from your host.
-	ENABLE_WEBHOOKS=false go run ./main.go 2>&1
+	ENABLE_WEBHOOKS=false go run ./main.go -zap-devel 2>&1
 
 docker-build: test ## Build docker image with the manager.
 	docker build -t ${IMG} .

@@ -26,6 +26,11 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
+controller:
+  # controller.logLevel -- Set the to configure the verbosity of logging. Can be one of
+  # 'debug', 'info', 'error'.
+  logLevel: info
+
 replicaCount: 1
 
 # watchNamespaces -- A comma-separated list of namespaces that the operator should watch.
