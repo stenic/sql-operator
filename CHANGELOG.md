@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/stenic/sql-operator/compare/v1.8.2...v1.9.0) (2021-11-05)
+
+
+### Features
+
+* Implement delete grants ([c1c7694](https://github.com/stenic/sql-operator/commit/c1c76941aca6fa90e7011e749613ee58b5aa501c))
+
 ## [1.8.2](https://github.com/stenic/sql-operator/compare/v1.8.1...v1.8.2) (2021-11-05)
 
 
