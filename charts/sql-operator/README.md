@@ -47,6 +47,7 @@ The following tables list the configurable parameters of the sql-operator chart 
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity and anti-affinity |
 | annotations | object | `{}` | Additional annotations for the controller pods. |
+| controller.logLevel | string | `"info"` | Set the to configure the verbosity of logging. Can be one of 'debug', 'info', 'error'. |
 | envVars | list | `[]` | Additional environment variables for the controller. |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/stenic/sql-operator"` |  |
