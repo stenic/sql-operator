@@ -168,9 +168,6 @@ func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.
 	toGrant := difference(grants.Spec.Grants, currentGrants)
 	toRevoke := difference(currentGrants, grants.Spec.Grants)
 
-	log.V(1).Info(fmt.Sprintf("toGrant:  %v\n", pp(toGrant)))
-	log.V(1).Info(fmt.Sprintf("toRevoke: %v\n", pp(toRevoke)))
-
 	// Revoke removed
 	for _, grantName := range toRevoke {
 		if _, err := db.ExecContext(ctx, fmt.Sprintf(
