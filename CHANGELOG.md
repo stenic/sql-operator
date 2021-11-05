@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/stenic/sql-operator/compare/v1.8.0...v1.8.1) (2021-11-05)
+
+
+### Bug Fixes
+
+* Handle missing secret ([09fe2f8](https://github.com/stenic/sql-operator/commit/09fe2f8d9b2abfc046eeecae2e728f336475b404))
+
 # [1.8.0](https://github.com/stenic/sql-operator/compare/v1.7.0...v1.8.0) (2021-11-05)
 
 
