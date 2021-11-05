@@ -3,6 +3,8 @@ repo_url: https://github.com/stenic/sql-operator
 strict: true
 theme:
   name: material
+  icon:
+    logo: material/database-cog
   palette:
     primary: blue
   font:
