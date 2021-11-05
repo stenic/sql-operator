@@ -269,9 +269,52 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Getting started
+      </label>
+    
     <a href="./" title="Getting started" class="md-nav__link md-nav__link--active">
       Getting started
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installing-sql-operator" title="Installing Sql-operator" class="md-nav__link">
+    Installing Sql-operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#define-an-host-you-want-to-manage" title="Define an host you want to manage" class="md-nav__link">
+    Define an host you want to manage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-database-user-and-grants" title="Create a database, user and grants" class="md-nav__link">
+    Create a database, user and grants
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -329,6 +372,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installing-sql-operator" title="Installing Sql-operator" class="md-nav__link">
+    Installing Sql-operator
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#define-an-host-you-want-to-manage" title="Define an host you want to manage" class="md-nav__link">
+    Define an host you want to manage
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-database-user-and-grants" title="Create a database, user and grants" class="md-nav__link">
+    Create a database, user and grants
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -343,6 +416,51 @@
                 
                 
                 <h1 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
+<p>To see how Sql-operator works, you can install it and configure some examples.</p>
+<p>Firstly, you'll need a Kubernetes cluster, kubectl and helm set-up</p>
+<h2 id="installing-sql-operator">Installing Sql-operator<a class="headerlink" href="#installing-sql-operator" title="Permanent link">&para;</a></h2>
+<p>To get started quickly, you can use the
+<a href="https://artifacthub.io/packages/helm/sql-operator/sql-operator">helm chart</a>
+which will install Sql-operator:</p>
+<div class="highlight"><pre><span></span><code>helm repo add sql-operator https://stenic.github.io/sql-operator/
+helm install sql-operator --namespace sql-operator --create-namespace sql-operator/sql-operator
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The examples will use an in-cluster database for demo simplicity. Please use the following command
+to install it. </p>
+<div class="highlight"><pre><span></span><code>helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install test-db <span class="se">\</span>
+    --namespace sql-operator-testdb --create-namespace <span class="se">\</span>
+    --set auth.rootPassword<span class="o">=</span>n0tS3cur3 <span class="se">\</span>
+    --set primary.persistence.enabled<span class="o">=</span><span class="nb">false</span> <span class="se">\</span>
+    --set secondary.persistence.enabled<span class="o">=</span><span class="nb">false</span> <span class="se">\</span>
+    bitnami/mariadb
+</code></pre></div>
+</div>
+<h2 id="define-an-host-you-want-to-manage">Define an host you want to manage<a class="headerlink" href="#define-an-host-you-want-to-manage" title="Permanent link">&para;</a></h2>
+<p>First of, we will need to configure one or more <code>SqlHost</code> objects. These object are used by sql-operator
+to grab the endpoint and the correct credentials.</p>
+<div class="highlight"><pre><span></span><code>kubectl apply -f https://raw.githubusercontent.com/stenic/sql-operator/master/examples/sqlhost-mysql.yaml
+kubectl get sqlhost
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you didn't install the in-cluster database, you can alter the manifest.</p>
+<div class="highlight"><pre><span></span><code>kubectl edit sqlhost sample-host
+</code></pre></div>
+</div>
+<h2 id="create-a-database-user-and-grants">Create a database, user and grants<a class="headerlink" href="#create-a-database-user-and-grants" title="Permanent link">&para;</a></h2>
+<p>Not that we have a host defined, we can create our first assets.</p>
+<div class="highlight"><pre><span></span><code>kubectl apply -f https://raw.githubusercontent.com/stenic/sql-operator/master/examples/sqldatabase-gettingstarted.yaml
+kubectl apply -f https://raw.githubusercontent.com/stenic/sql-operator/master/examples/sqluser-gettingstarted.yaml
+kubectl apply -f https://raw.githubusercontent.com/stenic/sql-operator/master/examples/sqlgrant-gettingstarted.yaml
+</code></pre></div>
+<p>Let's verify our resources got created. (Password is <code>n0tS3cur3</code>)</p>
+<div class="highlight"><pre><span></span><code>kubectl <span class="nb">exec</span> -ti -n sql-operator-testdb test-db-mariadb-0 -- mysql -uroot -p -e <span class="s1">&#39;show databases;&#39;</span>
+kubectl <span class="nb">exec</span> -ti -n sql-operator-testdb test-db-mariadb-0 -- mysql -uroot -p -e <span class="s1">&#39;select user from mysql.user;&#39;</span>
+kubectl <span class="nb">exec</span> -ti -n sql-operator-testdb test-db-mariadb-0 -- mysql -uroot -p -e <span class="s1">&#39;show grants for sample_username;&#39;</span>
+</code></pre></div>
                 
                   
                 
