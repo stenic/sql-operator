@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/stenic/sql-operator/compare/v1.6.0...v1.6.1) (2021-11-05)
+
+
+### Bug Fixes
+
+* Handle grant lookup better ([70b9b25](https://github.com/stenic/sql-operator/commit/70b9b25ce83f3d7602ab6d4ed4395cc497f1e3f6))
+
 # [1.6.0](https://github.com/stenic/sql-operator/compare/v1.5.19...v1.6.0) (2021-11-04)
 
 
