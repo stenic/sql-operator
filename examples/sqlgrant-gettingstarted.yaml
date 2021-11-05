@@ -1,0 +1,21 @@
+apiVersion: stenic.io/v1alpha1
+kind: SqlGrant
+metadata:
+  name: sample-grant
+spec:
+  userRef:
+    name: sample-user
+  databaseRef:
+    name: sample-db
+  grants:
+    - DELETE
+    - DROP
+    - INDEX
+    - INSERT
+    - SELECT
+    - UPDATE
+    - TRIGGER
+    - CREATE TEMPORARY TABLES
+    - EXECUTE
+    - LOCK TABLES
+  cleanupPolicy: Delete

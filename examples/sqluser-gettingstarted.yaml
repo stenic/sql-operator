@@ -1,0 +1,11 @@
+apiVersion: stenic.io/v1alpha1
+kind: SqlUser
+metadata:
+  name: sample-user
+spec:
+  credentials:
+    username: sample_username
+    password: sample_password
+  hostRef:
+    name: sample-host
+  cleanupPolicy: Delete
