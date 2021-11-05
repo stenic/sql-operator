@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+{{- if .Values.controller.admissionWebhooks.enabled -}}
 {{- $cn := printf "%s.%s.svc" ( include "sql-operator.name" . ) .Release.Namespace -}}
 {{- $ca := genCA "default-ca" 3650 -}}
 {{- $altNames := list ( printf "%s" ( include "sql-operator.name" . ) ) ( printf "%s.%s" ( include "sql-operator.name" . ) .Release.Namespace ) ( printf "%s.%s.svc" ( include "sql-operator.name" . ) .Release.Namespace ) -}}
@@ -129,3 +129,4 @@ type: kubernetes.io/tls
 data:
   tls.crt: {{ b64enc $cert.Cert }}
   tls.key: {{ b64enc $cert.Key }}
+{{- end -}}

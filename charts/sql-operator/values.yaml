@@ -30,6 +30,9 @@ controller:
   # controller.logLevel -- Set the to configure the verbosity of logging. Can be one of
   # 'debug', 'info', 'error'.
   logLevel: info
+  admissionWebhooks:
+    # controller.admissionWebhooks.enabled -- Enable the admissionWebhooks for additional validation.
+    enabled: false
 
 replicaCount: 1
 

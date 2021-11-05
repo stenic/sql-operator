@@ -63,6 +63,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+          {{- if not .Values.controller.admissionWebhooks.enabled }}
+          - name: ENABLE_WEBHOOKS
+            value: "false"
+          {{- end }}
           {{- if .Values.envVars }}
           {{- toYaml .Values.envVars | nindent 10 }}
           {{- end }}
@@ -70,9 +74,11 @@ spec:
           - containerPort: 8080
             name: metrics
             protocol: TCP
+          {{- if .Values.controller.admissionWebhooks.enabled }}
           - containerPort: 9443
             name: webhook
             protocol: TCP
+          {{- end }}
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
