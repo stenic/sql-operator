@@ -20,5 +20,6 @@ nav:
   - Overview: index.md
   - core-concepts.md
   - getting-started.md
+  - crds.md
   - Extras:
     - extras/argocd.md

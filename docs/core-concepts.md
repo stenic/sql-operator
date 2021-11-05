@@ -1,10 +1,8 @@
 # Core concepts
 
-## SqlHost
+## Create
 
-## SqlDatabase
+## Reconcile
 
-## SqlUser
-
-## SqlGrant
+## Cleanup
 
