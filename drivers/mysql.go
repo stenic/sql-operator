@@ -237,13 +237,16 @@ func (d *MySqlDriver) DeleteGrants(ctx context.Context, grants steniciov1alpha1.
 	}
 	defer db.Close()
 
-	// // Delete the database
-	// if _, err := db.QueryContext(ctx, fmt.Sprintf(
-	// 	"DROP DATABASE IF EXISTS %s;",
-	// 	database.Spec.DatabaseName,
-	// )); err != nil {
-	// 	return err
-	// }
+	for _, grantName := range grants.Spec.Grants {
+		if _, err := db.ExecContext(ctx, fmt.Sprintf(
+			"REVOKE %s ON %s.* FROM '%s'@'%%';",
+			grantName,
+			database.Spec.DatabaseName,
+			user.Spec.Credentials.Username,
+		)); err != nil {
+			log.Error(err, "Failed to revoke "+grantName)
+		}
+	}
 
 	log.V(1).Info("DELETE GRANTS")
 
