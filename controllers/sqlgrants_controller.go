@@ -77,7 +77,6 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, grants.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
-		log.Info(fmt.Sprintf("DBG: Trying to find SqlHost with %v and %v ", database.Spec.HostRef, database.Spec.HostRef))
 		r.Recorder.Event(&grants, "Warning", "Error", "unable to find SqlHost")
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
