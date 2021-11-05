@@ -1,0 +1,9 @@
+apiVersion: stenic.io/v1alpha1
+kind: SqlDatabase
+metadata:
+  name: sample-db
+spec:
+  databaseName: sample_dbname
+  hostRef:
+    name: sample-host
+  cleanupPolicy: Delete

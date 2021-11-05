@@ -1,0 +1,12 @@
+apiVersion: stenic.io/v1alpha1
+kind: SqlHost
+metadata:
+  name: sample-host
+spec:
+  engine: Mysql
+  endpoint:
+    host: test-db-mariadb.sql-operator-testdb
+    port: 3306
+  credentials:
+    username: root
+    password: n0tS3cur3
