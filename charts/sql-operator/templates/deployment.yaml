@@ -94,9 +94,11 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         volumeMounts:
+        {{- if not .Values.controller.admissionWebhooks.enabled }}
         - name: webhook-cert
           mountPath: /tmp/k8s-webhook-server/serving-certs
           readOnly: true
+        {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
       {{- if .Values.sidecarContainers }}
@@ -111,10 +113,12 @@ spec:
         {{ toYaml .Values.affinity | nindent 8 }}
       {{- end }}
       volumes:
+      {{- if not .Values.controller.admissionWebhooks.enabled }}
       - name: webhook-cert
         secret:
           defaultMode: 420
           secretName: {{ template "sql-operator.fullname" . }}-admission-webhook-keypair
+      {{- end }}
       {{- if .Values.tolerations }}
       tolerations:
         {{ toYaml .Values.tolerations | nindent 8 }}
