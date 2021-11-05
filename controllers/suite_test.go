@@ -17,11 +17,13 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -30,6 +32,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"github.com/stenic/sql-operator/api/v1alpha1"
 	steniciov1alpha1 "github.com/stenic/sql-operator/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
@@ -87,6 +90,89 @@ var _ = BeforeSuite(func() {
 	Expect(k8sClient).NotTo(BeNil())
 
 }, 60)
+
+var _ = Describe("Sql-operator", func() {
+
+	const (
+		SqlHostName     = "test-host"
+		SqlDatabaseName = "test-host"
+	)
+
+	var validHost = &v1alpha1.SqlHost{
+		TypeMeta: v1.TypeMeta{
+			APIVersion: "stenic.io/v1alpha1",
+			Kind:       "SqlHost",
+		},
+		ObjectMeta: v1.ObjectMeta{
+			Name:      SqlHostName,
+			Namespace: "default",
+		},
+		Spec: v1alpha1.SqlHostSpec{
+			Engine: "Mysql",
+			Endpoint: steniciov1alpha1.SqlHostEndpoint{
+				Host: "127.0.0.1",
+				Port: 3306,
+			},
+			Credentials: steniciov1alpha1.SqlCredentials{
+				Username: "username",
+				Password: "password",
+			},
+		},
+	}
+
+	var validDatabase = &v1alpha1.SqlDatabase{
+		TypeMeta: v1.TypeMeta{
+			APIVersion: "stenic.io/v1alpha1",
+			Kind:       "SqlDatabase",
+		},
+		ObjectMeta: v1.ObjectMeta{
+			Name:      SqlDatabaseName,
+			Namespace: "default",
+		},
+		Spec: v1alpha1.SqlDatabaseSpec{
+			HostRef: v1alpha1.SqlObjectRef{
+				Name: SqlHostName,
+			},
+			DatabaseName: "test123",
+		},
+	}
+
+	Context("SqlHost Validations", func() {
+		ctx := context.Background()
+		It("Should fail on lowercase mysql", func() {
+			By("Creating a SqlHost", func() {
+				var invalid = validHost.DeepCopy()
+				invalid.Spec.Engine = "mysql"
+				err := k8sClient.Create(ctx, invalid)
+				Expect(err).To(HaveOccurred())
+			})
+		})
+	})
+
+	Context("SqlHost Crud", func() {
+		ctx := context.Background()
+		It("Should create without issue", func() {
+			By("Creating a SqlHost", func() {
+				Expect(k8sClient.Create(ctx, validHost.DeepCopy())).Should(Succeed())
+			})
+			By("Deleting a SqlHost", func() {
+				Expect(k8sClient.Delete(ctx, validHost.DeepCopy())).Should(Succeed())
+			})
+		})
+	})
+
+	Context("SqlDB Crud", func() {
+		ctx := context.Background()
+		It("Should create without issue", func() {
+			By("Creating a SqlHost", func() {
+				Expect(k8sClient.Create(ctx, validDatabase.DeepCopy())).Should(Succeed())
+			})
+			By("Deleting a SqlHost", func() {
+				Expect(k8sClient.Delete(ctx, validDatabase.DeepCopy())).Should(Succeed())
+			})
+		})
+	})
+})
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
