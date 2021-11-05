@@ -75,13 +75,14 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
 	var host steniciov1alpha1.SqlHost
-	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, database.Spec.HostRef.Namespace), &host); err != nil {
+	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, grants.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
+		log.Info(fmt.Sprintf("DBG: Trying to find SqlHost with %v and %v ", database.Spec.HostRef, database.Spec.HostRef))
 		r.Recorder.Event(&grants, "Warning", "Error", "unable to find SqlHost")
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
 
-	if getNamespacedName(database.Spec.HostRef, database.Spec.HostRef.Namespace) != getNamespacedName(user.Spec.HostRef, user.Spec.HostRef.Namespace) {
+	if getNamespacedName(database.Spec.HostRef, grants.Namespace) != getNamespacedName(user.Spec.HostRef, grants.Namespace) {
 		err := fmt.Errorf("SqlDatabase and SqlUser don't share the same SqlHost")
 		r.Recorder.Event(&grants, "Warning", "Error", err.Error())
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
