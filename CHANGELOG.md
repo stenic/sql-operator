@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/stenic/sql-operator/compare/v1.6.3...v1.7.0) (2021-11-05)
+
+
+### Features
+
+* Allow to set log-level ([0831998](https://github.com/stenic/sql-operator/commit/083199843d274ff236a8555f4c4b2740931c7913))
+* Allow to set log-level ([5833b6d](https://github.com/stenic/sql-operator/commit/5833b6d4fff5ce0ab414e81fee424c9949a29c19))
+
 ## [1.6.3](https://github.com/stenic/sql-operator/compare/v1.6.2...v1.6.3) (2021-11-05)
 
 
