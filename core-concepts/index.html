@@ -432,9 +432,16 @@
                 
                 
                 <h1 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h1>
+<p>Sql-operator aims to solve 3 different cases when dealing with Sql resources.</p>
 <h2 id="create">Create<a class="headerlink" href="#create" title="Permanent link">&para;</a></h2>
+<p>Simplify creation of Sql resouces that are dependecies of your application. 
+You define what database, user and grants you want and Sql-operator will ensure they are created.</p>
 <h2 id="reconcile">Reconcile<a class="headerlink" href="#reconcile" title="Permanent link">&para;</a></h2>
+<p>At set intervals (default 10 seconds) sql-operator will validate if the resources are still in the
+desired state. If not it will re-apply the wanted state. This adds an additional layer of control.</p>
 <h2 id="cleanup">Cleanup<a class="headerlink" href="#cleanup" title="Permanent link">&para;</a></h2>
+<p>If configured using the <code>cleanupPolicy</code>, sql-operator will delete the external resouces. This way
+your resources stay clean.</p>
                 
               
               
