@@ -2,6 +2,7 @@
 
 [![Last release](https://github.com/stenic/sql-operator/actions/workflows/release.yaml/badge.svg)](https://github.com/stenic/sql-operator/actions/workflows/release.yaml)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/sql-operator)](https://artifacthub.io/packages/search?repo=sql-operator)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fstenic%2Fsql-operator.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fstenic%2Fsql-operator?ref=badge_shield)
 
 
 Operate sql databases, users and grants.
@@ -105,3 +106,7 @@ spec:
     - DELETE
   cleanupPolicy: Delete
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fstenic%2Fsql-operator.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fstenic%2Fsql-operator?ref=badge_large)
