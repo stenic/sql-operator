@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/stenic/sql-operator/compare/v1.9.1...v1.10.0) (2021-11-14)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/onsi/gomega to v1.17.0 ([61f774e](https://github.com/stenic/sql-operator/commit/61f774ef9509974d72fa87bed887db7cf486255e))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.10.3 ([b1de5fb](https://github.com/stenic/sql-operator/commit/b1de5fbb429b8f0d3f4d8dc13f349953981df47d))
+* Disable webhook by default ([f8f2e85](https://github.com/stenic/sql-operator/commit/f8f2e851a0d78fdd571f95682b3a52f3e33a4370))
+* Publish driver errors to events ([d4cfb17](https://github.com/stenic/sql-operator/commit/d4cfb1781c632af8a17fc5899320d3307e58c05d)), closes [#38](https://github.com/stenic/sql-operator/issues/38)
+
+
+### Features
+
+* Don't delete object befor it's children are deleted ([7812dcb](https://github.com/stenic/sql-operator/commit/7812dcbc83863f1e8cea5d13d43fe2949a46e29b)), closes [#33](https://github.com/stenic/sql-operator/issues/33)
+
 ## [1.9.1](https://github.com/stenic/sql-operator/compare/v1.9.0...v1.9.1) (2021-11-05)
 
 
