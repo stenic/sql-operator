@@ -70,6 +70,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
 	finalizerName := "stenic.io/sqluser-deletion"
 	// examine DeletionTimestamp to determine if object is under deletion
@@ -88,9 +89,27 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		if controllerutil.ContainsFinalizer(&user, finalizerName) {
 			// our finalizer is present, so lets handle any external dependency
 
+			var children steniciov1alpha1.SqlGrantList
+			if err := isReferenced(ctx, r.Client, &children, referencedUserKey, &user); err != nil {
+				r.Recorder.Event(&user, "Warning", "Error", err.Error())
+				return ctrl.Result{}, err
+			}
+			if len(children.Items) > 0 {
+				err := fmt.Errorf(
+					"%s - [%s/%s] ...",
+					"Can't delete, found other referencing this object",
+					children.Items[0].Namespace,
+					children.Items[0].Name,
+				)
+				r.Recorder.Event(&user, "Warning", "Error", err.Error())
+				// might have been faster than referenced object, reschedule.
+				return scheduledResult, err
+			}
+
 			if user.Spec.CleanupPolicy == steniciov1alpha1.CleanupPolicyDelete {
 				// delete the user
 				if err = driver.DeleteUser(ctx, user); err != nil {
+					r.Recorder.Event(&user, "Warning", "Error", err.Error())
 					return ctrl.Result{}, err
 				}
 			}
@@ -110,8 +129,6 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if user.Status.LastModifiedTimestamp != nil && time.Since(user.Status.LastModifiedTimestamp.Time) < r.RefreshRate {
 		return ctrl.Result{}, nil
 	}
-
-	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
 	if !user.Status.Created {
 		user.Status.Created = true
@@ -138,6 +155,18 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SqlUserReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &steniciov1alpha1.SqlGrant{}, referencedUserKey, func(rawObj client.Object) []string {
+		object := rawObj.(*steniciov1alpha1.SqlGrant)
+		ns := object.Spec.UserRef.Namespace
+		if ns == "" {
+			ns = object.Namespace
+		}
+
+		return []string{ns + "/" + object.Spec.UserRef.Name}
+	}); err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&steniciov1alpha1.SqlUser{}).
 		Complete(r)
