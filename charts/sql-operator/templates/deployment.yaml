@@ -53,6 +53,9 @@ spec:
         {{- if .Values.watchNamespaces }}
         - --watch-namespaces={{- include "sql-operator.watchNamespaces" . -}}
         {{- end }}
+        {{- if gt .Values.replicaCount 1.0 }}
+        - --leader-elect=true
+        {{- end }}
         - -zap-log-level={{ .Values.controller.logLevel }}
         env:
           - name: POD_NAMESPACE
