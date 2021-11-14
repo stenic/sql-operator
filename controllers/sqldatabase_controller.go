@@ -74,6 +74,8 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
+	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
+
 	finalizerName := "stenic.io/sqldatabase-deletion"
 	// examine DeletionTimestamp to determine if object is under deletion
 	if database.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -91,9 +93,27 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		if controllerutil.ContainsFinalizer(&database, finalizerName) {
 			// our finalizer is present, so lets handle any external dependency
 
+			var children steniciov1alpha1.SqlGrantList
+			if err := isReferenced(ctx, r.Client, &children, referencedDatabaseKey, &database); err != nil {
+				r.Recorder.Event(&database, "Warning", "Error", err.Error())
+				return ctrl.Result{}, err
+			}
+			if len(children.Items) > 0 {
+				err := fmt.Errorf(
+					"%s - [%s/%s] ...",
+					"Can't delete, found other referencing this object",
+					children.Items[0].Namespace,
+					children.Items[0].Name,
+				)
+				r.Recorder.Event(&database, "Warning", "Error", err.Error())
+				// might have been faster than referenced object, reschedule.
+				return scheduledResult, err
+			}
+
 			if database.Spec.CleanupPolicy == steniciov1alpha1.CleanupPolicyDelete {
 				// delete the user
 				if err = driver.DeleteDatabase(ctx, database); err != nil {
+					r.Recorder.Event(&database, "Warning", "Error", err.Error())
 					return ctrl.Result{}, err
 				}
 			}
@@ -113,8 +133,6 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if database.Status.LastModifiedTimestamp != nil && time.Since(database.Status.LastModifiedTimestamp.Time) < r.RefreshRate {
 		return ctrl.Result{}, nil
 	}
-
-	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
 	if !database.Status.Created {
 		database.Status.Created = true
@@ -142,6 +160,18 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *SqlDatabaseReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	if err := mgr.GetFieldIndexer().IndexField(context.Background(), &steniciov1alpha1.SqlGrant{}, referencedDatabaseKey, func(rawObj client.Object) []string {
+		object := rawObj.(*steniciov1alpha1.SqlGrant)
+		ns := object.Spec.DatabaseRef.Namespace
+		if ns == "" {
+			ns = object.Namespace
+		}
+
+		return []string{ns + "/" + object.Spec.DatabaseRef.Name}
+	}); err != nil {
+		return err
+	}
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&steniciov1alpha1.SqlDatabase{}).
 		Complete(r)

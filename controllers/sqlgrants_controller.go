@@ -113,6 +113,7 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			if grants.Spec.CleanupPolicy == steniciov1alpha1.CleanupPolicyDelete {
 				// delete the user
 				if err = driver.DeleteGrants(ctx, grants, user, database); err != nil {
+					r.Recorder.Event(&grants, "Warning", "Error", err.Error())
 					return ctrl.Result{}, err
 				}
 			}
