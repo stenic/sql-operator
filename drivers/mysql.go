@@ -19,14 +19,7 @@ type MySqlDriver struct {
 }
 
 func (d *MySqlDriver) connect() (*sql.DB, error) {
-	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/",
-		d.Host.Spec.Credentials.Username,
-		d.Host.Spec.Credentials.Password,
-		d.Host.Spec.Endpoint.Host,
-		d.Host.Spec.Endpoint.Port,
-	)
-	db, err := sql.Open("mysql", dsn)
+	db, err := sql.Open("mysql", d.Host.Spec.DSN)
 	if err == nil {
 		db.SetConnMaxLifetime(time.Minute * 1)
 		db.SetMaxIdleConns(0)

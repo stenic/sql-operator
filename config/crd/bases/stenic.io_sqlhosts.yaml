@@ -32,34 +32,16 @@ spec:
           spec:
             description: SqlHostSpec defines the desired state of SqlHost
             properties:
-              credentials:
-                description: Credentials to use when connecting to the endpoint
-                properties:
-                  password:
-                    description: Password for the sql user
-                    type: string
-                  username:
-                    description: Username for the sql user
-                    type: string
-                type: object
-              endpoint:
+              dsn:
                 description: Endpoint to manage
-                properties:
-                  host:
-                    description: Host of the sql server. This can be either dns or ip
-                    type: string
-                  port:
-                    description: Port to use when connecting to the sql server
-                    type: integer
-                type: object
+                type: string
               engine:
                 description: Engine of the external endpoint (like Mysql)
                 enum:
                 - Mysql
                 type: string
             required:
-            - credentials
-            - endpoint
+            - dsn
             - engine
             type: object
           status:
