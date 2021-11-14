@@ -26,10 +26,7 @@ type SqlHostSpec struct {
 	Engine EngineType `json:"engine"`
 
 	// Endpoint to manage
-	Endpoint SqlHostEndpoint `json:"endpoint"`
-
-	// Credentials to use when connecting to the endpoint
-	Credentials SqlCredentials `json:"credentials"`
+	DSN string `json:"dsn"`
 }
 
 // +kubebuilder:validation:Enum=Mysql

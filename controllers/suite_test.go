@@ -109,14 +109,7 @@ var _ = Describe("Sql-operator", func() {
 		},
 		Spec: v1alpha1.SqlHostSpec{
 			Engine: "Mysql",
-			Endpoint: steniciov1alpha1.SqlHostEndpoint{
-				Host: "127.0.0.1",
-				Port: 3306,
-			},
-			Credentials: steniciov1alpha1.SqlCredentials{
-				Username: "username",
-				Password: "password",
-			},
+			DSN:    "username:password@tcp(127.0.0.1:3306)/",
 		},
 	}
 
