@@ -126,6 +126,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	count, err := driver.UpsertUser(ctx, user)
 	if err != nil {
 		log.Error(err, "failed to create SqlUser")
+		r.Recorder.Event(&user, "Warning", "Error", err.Error())
 		return ctrl.Result{}, err
 	}
 	if count > 0 {

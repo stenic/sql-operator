@@ -151,6 +151,7 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	count, err := driver.UpsertGrants(ctx, grants, user, database)
 	if err != nil {
 		log.Error(err, "failed to create SqlGrant")
+		r.Recorder.Event(&grants, "Warning", "Error", err.Error())
 		return ctrl.Result{}, err
 	}
 	if count > 0 {
