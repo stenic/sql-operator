@@ -9,12 +9,7 @@ metadata:
   name: integration
 spec:
   engine: Mysql
-  endpoint:
-    host: 123.123.123.123
-    port: 3306
-  credentials:
-    username: sqloperator
-    password: xxxxxxxxxxx
+  dsn: sqloperator:xxxxxxxxxxx@tcp(192.168.1.123:3306)/
 ```
 
 ```yaml
