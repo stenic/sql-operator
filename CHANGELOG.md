@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/stenic/sql-operator/compare/v1.10.1...v1.11.0) (2021-11-14)
+
+
+### Features
+
+* Change SqlHost to DSN ([a7c3872](https://github.com/stenic/sql-operator/commit/a7c3872964d4689ad826af7416ff90403241dcd9)), closes [#37](https://github.com/stenic/sql-operator/issues/37)
+* Change SqlHost to DSN ([7613db7](https://github.com/stenic/sql-operator/commit/7613db7b9395d8c14b388ed257482aaaf3f5c243)), closes [#37](https://github.com/stenic/sql-operator/issues/37)
+
 ## [1.10.1](https://github.com/stenic/sql-operator/compare/v1.10.0...v1.10.1) (2021-11-14)
 
 
