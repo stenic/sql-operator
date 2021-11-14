@@ -121,7 +121,7 @@ func main() {
 		setupLog.Error(err, initControllerErr, "controller", "SqlGrant")
 		os.Exit(1)
 	}
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+	if os.Getenv("ENABLE_WEBHOOKS") == "true" {
 		if err = (&steniciov1alpha1.SqlDatabase{}).SetupWebhookWithManager(mgr); err != nil {
 			setupLog.Error(err, initWebhookErr, "webhook", "SqlDatabase")
 			os.Exit(1)
