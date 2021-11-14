@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.1](https://github.com/stenic/sql-operator/compare/v1.10.0...v1.10.1) (2021-11-14)
+
+
+### Bug Fixes
+
+* Enable leader-elect when running ha ([43d306c](https://github.com/stenic/sql-operator/commit/43d306c1e81fc8aaa1d6768f86477be1161d6d81))
+
 # [1.10.0](https://github.com/stenic/sql-operator/compare/v1.9.1...v1.10.0) (2021-11-14)
 
 
