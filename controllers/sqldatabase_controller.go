@@ -130,6 +130,7 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	count, err := driver.UpsertDatabase(ctx, database)
 	if err != nil {
 		log.Error(err, "failed to create SqlDatabase")
+		r.Recorder.Event(&database, "Warning", "Error", err.Error())
 		return ctrl.Result{}, err
 	}
 	if count > 0 {
