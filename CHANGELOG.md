@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.12.1](https://github.com/stenic/sql-operator/compare/v1.12.0...v1.12.1) (2021-11-15)
+
+
+### Bug Fixes
+
+* Add ServiceMonitor ([05e9af0](https://github.com/stenic/sql-operator/commit/05e9af0c16615579e085e48f3be2742039e06b1a))
+
 # [1.12.0](https://github.com/stenic/sql-operator/compare/v1.11.0...v1.12.0) (2021-11-15)
 
 
