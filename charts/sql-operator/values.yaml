@@ -33,6 +33,17 @@ controller:
   admissionWebhooks:
     # controller.admissionWebhooks.enabled -- Enable the admissionWebhooks for additional validation.
     enabled: false
+  metrics:
+    # controller.metrics.enabled -- Expose metrics from the controller
+    enabled: false
+    service:
+      # controller.metrics.service.annotations -- Configure annotation on the metrics service
+      annotations: {}
+        # prometheus.io/scrape: "true"
+        # prometheus.io/port: "10254"
+    serviceMonitor:
+      # controller.metrics.serviceMonitor.enabled -- Enable the serviceMonitor
+      enabled: false
 
 replicaCount: 1
 

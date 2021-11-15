@@ -12,15 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-{{- if .Values.controller.admissionWebhooks.enabled -}}
+{{- if .Values.controller.metrics.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "sql-operator.fullname" . }}
+  name: {{ include "sql-operator.fullname" . }}-metrics
+  labels:
+    control-plane: sql-operator
+{{- if .Values.controller.metrics.service.annotations }}
+  annotations:
+    {{ toYaml .Values.controller.metrics.service.annotations | nindent 4 }}
+{{- end }}
 spec:
   ports:
-    - port: 443
-      targetPort: 9443
+    - name: metrics
+      port: 8080
+      protocol: TCP
+      targetPort: metrics
   selector:
     control-plane: sql-operator
 {{- end -}}

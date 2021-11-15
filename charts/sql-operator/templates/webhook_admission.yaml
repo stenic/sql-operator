@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-{{- if .Values.controller.admissionWebhooks.enabled -}}
+
+{{- if .Values.controller.admissionWebhooks.enabled }}
 {{- $cn := printf "%s.%s.svc" ( include "sql-operator.name" . ) .Release.Namespace -}}
 {{- $ca := genCA "default-ca" 3650 -}}
 {{- $altNames := list ( printf "%s" ( include "sql-operator.name" . ) ) ( printf "%s.%s" ( include "sql-operator.name" . ) .Release.Namespace ) ( printf "%s.%s.svc" ( include "sql-operator.name" . ) .Release.Namespace ) -}}
@@ -28,7 +29,7 @@ webhooks:
   clientConfig:
     caBundle: {{ b64enc $ca.Cert }}
     service:
-      name: {{ include "sql-operator.fullname" . }}
+      name: {{ include "sql-operator.fullname" . }}-webhook
       namespace: {{ .Release.Namespace }}
       path: /mutate-stenic-io-v1alpha1-sqldatabase
   failurePolicy: Fail
@@ -50,7 +51,7 @@ webhooks:
   clientConfig:
     caBundle: {{ b64enc $ca.Cert }}
     service:
-      name: {{ include "sql-operator.fullname" . }}
+      name: {{ include "sql-operator.fullname" . }}-webhook
       namespace: {{ .Release.Namespace }}
       path: /mutate-stenic-io-v1alpha1-sqluser
   failurePolicy: Fail
@@ -79,7 +80,7 @@ webhooks:
   clientConfig:
     caBundle: {{ b64enc $ca.Cert }}
     service:
-      name: {{ include "sql-operator.fullname" . }}
+      name: {{ include "sql-operator.fullname" . }}-webhook
       namespace: {{ .Release.Namespace }}
       path: /validate-stenic-io-v1alpha1-sqldatabase
   failurePolicy: Fail
@@ -101,7 +102,7 @@ webhooks:
   clientConfig:
     caBundle: {{ b64enc $ca.Cert }}
     service:
-      name: {{ include "sql-operator.fullname" . }}
+      name: {{ include "sql-operator.fullname" . }}-webhook
       namespace: {{ .Release.Namespace }}
       path: /validate-stenic-io-v1alpha1-sqluser
   failurePolicy: Fail

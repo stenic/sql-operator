@@ -28,8 +28,6 @@ spec:
     metadata:
       annotations:
         checksum/admission-webhook.yaml: {{ include (print $.Template.BasePath "/webhook_admission.yaml") . | sha256sum }}
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
         {{- if .Values.annotations }}
         {{ toYaml .Values.annotations | nindent 8 }}
         {{- end }}
