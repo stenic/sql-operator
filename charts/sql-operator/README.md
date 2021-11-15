@@ -49,6 +49,9 @@ The following tables list the configurable parameters of the sql-operator chart 
 | annotations | object | `{}` | Additional annotations for the controller pods. |
 | controller.admissionWebhooks.enabled | bool | `false` | Enable the admissionWebhooks for additional validation. |
 | controller.logLevel | string | `"info"` | Set the to configure the verbosity of logging. Can be one of 'debug', 'info', 'error'. |
+| controller.metrics.enabled | bool | `false` | Expose metrics from the controller |
+| controller.metrics.service.annotations | object | `{}` | Configure annotation on the metrics service |
+| controller.metrics.serviceMonitor.enabled | bool | `false` | Enable the serviceMonitor |
 | envVars | list | `[]` | Additional environment variables for the controller. |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/stenic/sql-operator"` |  |
