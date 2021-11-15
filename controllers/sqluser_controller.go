@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stenic/sql-operator/drivers"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
@@ -53,6 +54,13 @@ type SqlUserReconciler struct {
 func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
+	promLabels := prometheus.Labels{
+		"crd":       "sqlUser",
+		"namespace": req.Namespace,
+		"name":      req.Name,
+	}
+	sqlOperatorActions.With(promLabels).Inc()
+
 	var user steniciov1alpha1.SqlUser
 	if err := r.Get(ctx, req.NamespacedName, &user); err != nil {
 		// log.Error(err, "unable to fetch SqlUser")
@@ -63,6 +71,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err := r.Get(ctx, getNamespacedName(user.Spec.HostRef, user.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+user.Name)
 		r.Recorder.Event(&user, "Warning", "Error", "unable to find SqlHost")
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -92,6 +101,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			var children steniciov1alpha1.SqlGrantList
 			if err := isReferenced(ctx, r.Client, &children, referencedUserKey, &user); err != nil {
 				r.Recorder.Event(&user, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
 				return ctrl.Result{}, err
 			}
 			if len(children.Items) > 0 {
@@ -102,6 +112,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 					children.Items[0].Name,
 				)
 				r.Recorder.Event(&user, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
 				// might have been faster than referenced object, reschedule.
 				return scheduledResult, err
 			}
@@ -110,6 +121,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				// delete the user
 				if err = driver.DeleteUser(ctx, user); err != nil {
 					r.Recorder.Event(&user, "Warning", "Error", err.Error())
+					sqlOperatorActionsFailures.With(promLabels).Inc()
 					return ctrl.Result{}, err
 				}
 			}
@@ -144,10 +156,12 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		log.Error(err, "failed to create SqlUser")
 		r.Recorder.Event(&user, "Warning", "Error", err.Error())
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		return ctrl.Result{}, err
 	}
 	if count > 0 {
 		r.Recorder.Event(&user, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
+		sqlOperatorQueries.With(promLabels).Add(float64(count))
 	}
 
 	return scheduledResult, nil

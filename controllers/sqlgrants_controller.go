@@ -29,6 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/prometheus/client_golang/prometheus"
 	steniciov1alpha1 "github.com/stenic/sql-operator/api/v1alpha1"
 	"github.com/stenic/sql-operator/drivers"
 )
@@ -55,6 +56,14 @@ type SqlGrantReconciler struct {
 func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
+	promLabels := prometheus.Labels{
+		"crd":       "sqlGrant",
+		"namespace": req.Namespace,
+		"name":      req.Name,
+	}
+
+	sqlOperatorActions.With(promLabels).Inc()
+
 	var grants steniciov1alpha1.SqlGrant
 	if err := r.Get(ctx, req.NamespacedName, &grants); err != nil {
 		// log.Error(err, "unable to fetch SqlGrant")
@@ -72,18 +81,21 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if err := r.Get(ctx, getNamespacedName(grants.Spec.DatabaseRef, grants.Namespace), &database); err != nil {
 		log.Error(err, "unable to find SqlDatabase for "+grants.Name)
 		r.Recorder.Event(&grants, "Warning", "Error", "unable to find SqlDatabase")
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, grants.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
 		r.Recorder.Event(&grants, "Warning", "Error", "unable to find SqlHost")
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
 
 	if getNamespacedName(database.Spec.HostRef, grants.Namespace) != getNamespacedName(user.Spec.HostRef, grants.Namespace) {
 		err := fmt.Errorf("SqlDatabase and SqlUser don't share the same SqlHost")
 		r.Recorder.Event(&grants, "Warning", "Error", err.Error())
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		log.Error(err, "unable to find SqlHost for "+grants.Name)
 		return scheduledResult, client.IgnoreNotFound(err)
 	}
@@ -114,6 +126,7 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 				// delete the user
 				if err = driver.DeleteGrants(ctx, grants, user, database); err != nil {
 					r.Recorder.Event(&grants, "Warning", "Error", err.Error())
+					sqlOperatorActionsFailures.With(promLabels).Inc()
 					return ctrl.Result{}, err
 				}
 			}
@@ -153,10 +166,12 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if err != nil {
 		log.Error(err, "failed to create SqlGrant")
 		r.Recorder.Event(&grants, "Warning", "Error", err.Error())
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		return ctrl.Result{}, err
 	}
 	if count > 0 {
 		r.Recorder.Event(&grants, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
+		sqlOperatorQueries.With(promLabels).Add(float64(count))
 	}
 
 	grants.Status.CurrentGrants = grants.Spec.Grants
