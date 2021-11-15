@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/prometheus/client_golang/prometheus"
 	steniciov1alpha1 "github.com/stenic/sql-operator/api/v1alpha1"
 )
 
@@ -52,6 +53,13 @@ type SqlHostReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.8.3/pkg/reconcile
 func (r *SqlHostReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
+
+	promLabels := prometheus.Labels{
+		"crd":       "sqlHost",
+		"namespace": req.Namespace,
+		"name":      req.Name,
+	}
+	sqlOperatorActions.With(promLabels).Inc()
 
 	var host steniciov1alpha1.SqlHost
 	if err := r.Get(ctx, req.NamespacedName, &host); err != nil {
@@ -81,6 +89,7 @@ func (r *SqlHostReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			var userChildren steniciov1alpha1.SqlUserList
 			if err := isReferenced(ctx, r.Client, &userChildren, referencedHostKey, &host); err != nil {
 				r.Recorder.Event(&host, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
 				return ctrl.Result{}, err
 			}
 			if len(userChildren.Items) > 0 {
@@ -98,6 +107,7 @@ func (r *SqlHostReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			var databaseChildren steniciov1alpha1.SqlDatabaseList
 			if err := isReferenced(ctx, r.Client, &databaseChildren, referencedHostKey, &host); err != nil {
 				r.Recorder.Event(&host, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
 				return ctrl.Result{}, err
 			}
 			if len(databaseChildren.Items) > 0 {
@@ -108,6 +118,7 @@ func (r *SqlHostReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 					databaseChildren.Items[0].Name,
 				)
 				r.Recorder.Event(&host, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
 				// might have been faster than referenced object, reschedule.
 				return scheduledResult, err
 			}

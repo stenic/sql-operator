@@ -31,6 +31,8 @@ import (
 
 	steniciov1alpha1 "github.com/stenic/sql-operator/api/v1alpha1"
 	"github.com/stenic/sql-operator/drivers"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 // SqlDatabaseReconciler reconciles a SqlDatabase object
@@ -56,6 +58,14 @@ type SqlDatabaseReconciler struct {
 func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
+	promLabels := prometheus.Labels{
+		"crd":       "sqlDatabase",
+		"namespace": req.Namespace,
+		"name":      req.Name,
+	}
+
+	sqlOperatorActions.With(promLabels).Inc()
+
 	var database steniciov1alpha1.SqlDatabase
 	if err := r.Get(ctx, req.NamespacedName, &database); err != nil {
 		// log.Error(err, "unable to fetch SqlDatabase")
@@ -66,6 +76,7 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if err := r.Get(ctx, getNamespacedName(database.Spec.HostRef, database.Namespace), &host); err != nil {
 		log.Error(err, "unable to find SqlHost for "+database.Name)
 		r.Recorder.Event(&database, "Warning", "Error", "unable to find SqlHost")
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
@@ -96,6 +107,7 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			var children steniciov1alpha1.SqlGrantList
 			if err := isReferenced(ctx, r.Client, &children, referencedDatabaseKey, &database); err != nil {
 				r.Recorder.Event(&database, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
 				return ctrl.Result{}, err
 			}
 			if len(children.Items) > 0 {
@@ -106,6 +118,7 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 					children.Items[0].Name,
 				)
 				r.Recorder.Event(&database, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
 				// might have been faster than referenced object, reschedule.
 				return scheduledResult, err
 			}
@@ -114,6 +127,7 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 				// delete the user
 				if err = driver.DeleteDatabase(ctx, database); err != nil {
 					r.Recorder.Event(&database, "Warning", "Error", err.Error())
+					sqlOperatorActionsFailures.With(promLabels).Inc()
 					return ctrl.Result{}, err
 				}
 			}
@@ -149,10 +163,12 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if err != nil {
 		log.Error(err, "failed to create SqlDatabase")
 		r.Recorder.Event(&database, "Warning", "Error", err.Error())
+		sqlOperatorActionsFailures.With(promLabels).Inc()
 		return ctrl.Result{}, err
 	}
 	if count > 0 {
 		r.Recorder.Event(&database, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
+		sqlOperatorQueries.With(promLabels).Add(float64(count))
 	}
 
 	return scheduledResult, nil
