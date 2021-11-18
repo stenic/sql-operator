@@ -3,7 +3,6 @@ package drivers
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -13,6 +12,22 @@ import (
 	steniciov1alpha1 "github.com/stenic/sql-operator/api/v1alpha1"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
+
+var refSchema = "sqloperator_schema"
+var refSchemaDatabase = "sqldatabase_ref"
+var refSchemaUser = "sqluser_ref"
+var refSchemaGrant = "sqlgrant_ref"
+
+var createOwnerSchema = fmt.Sprintf(`CREATE DATABASE IF NOT EXISTS %s;`, refSchema)
+var createOwnerSchemaTableTpl = fmt.Sprintf(`
+CREATE TABLE IF NOT EXISTS %s.%%s (
+  id varchar(64) NOT NULL COMMENT 'Unique identifier',
+  name varchar(253) NOT NULL COMMENT 'Sql object name',
+  owner varchar(253) NOT NULL COMMENT 'Controller name',
+  resource varchar(507) NOT NULL COMMENT 'Kubernetes object reference',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+`, refSchema)
 
 type MySqlDriver struct {
 	Host steniciov1alpha1.SqlHost
@@ -199,9 +214,126 @@ func (d *MySqlDriver) UpsertGrants(ctx context.Context, grants steniciov1alpha1.
 	return changeCount, err
 }
 
-func pp(a []string) string {
-	j, _ := json.Marshal(a)
-	return string(j)
+func (d *MySqlDriver) InitOwnerSchema(ctx context.Context) error {
+	db, err := d.connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	if _, err = db.ExecContext(ctx, createOwnerSchema); err != nil {
+		return err
+	}
+	if _, err = db.ExecContext(ctx, fmt.Sprintf(createOwnerSchemaTableTpl, refSchemaDatabase)); err != nil {
+		return err
+	}
+	if _, err = db.ExecContext(ctx, fmt.Sprintf(createOwnerSchemaTableTpl, refSchemaUser)); err != nil {
+		return err
+	}
+	if _, err = db.ExecContext(ctx, fmt.Sprintf(createOwnerSchemaTableTpl, refSchemaGrant)); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *MySqlDriver) SetOwnerState(ctx context.Context, data OwnerShipData) error {
+	db, err := d.connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	_, err = db.ExecContext(
+		ctx,
+		fmt.Sprintf("INSERT IGNORE INTO %s (id, resource, name, owner) VALUES (?, ?, ?, ?) ;", d.getOwnerDBTable(data)),
+		data.OwnerID, data.Resource, data.Name, "sql-operator",
+	)
+
+	return err
+}
+
+func (d *MySqlDriver) GetOwnerState(ctx context.Context, data OwnerShipData) (OwnerState, error) {
+	state := NonExisting
+	db, err := d.connect()
+	if err != nil {
+		return state, err
+	}
+	defer db.Close()
+
+	sqlStatement := fmt.Sprintf("SELECT s.id FROM %s s WHERE resource=? LIMIT 1;", d.getOwnerDBTable(data))
+	var dbID string
+	row := db.QueryRowContext(ctx, sqlStatement, data.Resource)
+	switch err := row.Scan(&dbID); err {
+	case nil:
+		if dbID == string(data.OwnerID) {
+			return IsOwner, nil
+		}
+		return NotOwner, nil
+	case sql.ErrNoRows:
+		break
+	default:
+		return NotOwner, err
+	}
+
+	switch data.Type {
+	case OwnerShipTypeDatabase:
+		results, err := db.QueryContext(ctx, "SHOW databases;")
+		if err != nil {
+			return state, err
+		}
+		defer results.Close()
+
+		for results.Next() {
+			var dbName string
+			if err = results.Scan(&dbName); err != nil {
+				return state, err
+			}
+			if dbName == data.Name {
+				return NotOwner, nil
+			}
+		}
+	case OwnerShipTypeUser:
+		sqlStatement := fmt.Sprintf("SELECT count(u.id) FROM %s s WHERE resource=? LIMIT 1;", d.getOwnerDBTable(data))
+		var matchCount int
+		row := db.QueryRowContext(ctx, sqlStatement, data.Resource)
+		if err := row.Scan(&matchCount); err != nil {
+			return NotOwner, err
+		}
+		if matchCount >= 1 {
+			return NotOwner, nil
+		}
+	}
+
+	return NonExisting, nil
+}
+
+func (d *MySqlDriver) DeleteOwnerState(ctx context.Context, data OwnerShipData) error {
+	db, err := d.connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	_, err = db.ExecContext(
+		ctx,
+		fmt.Sprintf("DELETE FROM %s WHERE id = ? AND resource = ? LIMIT 1;", d.getOwnerDBTable(data)),
+		data.OwnerID, data.Resource,
+	)
+
+	return err
+}
+
+func (d *MySqlDriver) getOwnerDBTable(data OwnerShipData) string {
+	switch data.Type {
+	case OwnerShipTypeDatabase:
+		return fmt.Sprintf("`%s`.%s", refSchema, refSchemaDatabase)
+	case OwnerShipTypeUser:
+		return fmt.Sprintf("`%s`.%s", refSchema, refSchemaUser)
+	case OwnerShipTypeGrant:
+		return fmt.Sprintf("`%s`.%s", refSchema, refSchemaGrant)
+	default:
+		panic("unhandled ownership type")
+	}
 }
 
 func difference(a, b []string) []string {

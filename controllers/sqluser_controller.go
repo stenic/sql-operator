@@ -79,6 +79,19 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+
+	// Provide ownership data
+	err = driver.SetOwnershipData(ctx, drivers.OwnerShipData{
+		Type:     drivers.OwnerShipTypeUser,
+		Name:     user.Spec.Credentials.Username,
+		Resource: req.NamespacedName.String(),
+		OwnerID:  user.Status.OwnerID,
+	})
+	if err != nil {
+		r.Recorder.Event(&host, "Warning", "Error", err.Error())
+		return ctrl.Result{RequeueAfter: r.RefreshRate * 2}, err
+	}
+
 	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
 	finalizerName := "stenic.io/sqluser-deletion"
@@ -107,7 +120,7 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			if len(children.Items) > 0 {
 				err := fmt.Errorf(
 					"%s - [%s/%s] ...",
-					"Can't delete, found other referencing this object",
+					"can't delete, found other referencing this object",
 					children.Items[0].Namespace,
 					children.Items[0].Name,
 				)
@@ -116,15 +129,22 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 				// might have been faster than referenced object, reschedule.
 				return scheduledResult, err
 			}
+			r.Recorder.Event(&user, "Normal", "Delete", "Validated no child objects")
 
-			if user.Spec.CleanupPolicy == steniciov1alpha1.CleanupPolicyDelete {
-				// delete the user
-				if err = driver.DeleteUser(ctx, user); err != nil {
-					r.Recorder.Event(&user, "Warning", "Error", err.Error())
-					sqlOperatorActionsFailures.With(promLabels).Inc()
-					return ctrl.Result{}, err
-				}
+			// Cleanup ref
+			if err := driver.DeleteOwnerState(ctx); err != nil {
+				log.Error(err, "unable to cleanup ownership")
+				return ctrl.Result{}, err
 			}
+			r.Recorder.Event(&user, "Normal", "Delete", "Removed owner references")
+
+			// delete the user
+			if err = driver.DeleteUser(ctx, user); err != nil {
+				r.Recorder.Event(&user, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
+				return ctrl.Result{}, err
+			}
+			r.Recorder.Event(&user, "Normal", "Delete", "Deleted mysql object")
 
 			// remove our finalizer from the list and update it.
 			controllerutil.RemoveFinalizer(&user, finalizerName)
@@ -137,21 +157,16 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 
+	if driver.Noop {
+		r.Recorder.Event(&user, "Normal", "Noop", "Determined object is not owned")
+		return ctrl.Result{}, nil
+	}
+
 	// Deduplicate control loop
 	if user.Status.LastModifiedTimestamp != nil && time.Since(user.Status.LastModifiedTimestamp.Time) < r.RefreshRate {
 		return ctrl.Result{}, nil
 	}
 
-	if !user.Status.Created {
-		user.Status.Created = true
-		user.Status.CreationTimestamp = &metav1.Time{Time: time.Now()}
-	}
-	user.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
-
-	if err := r.Status().Update(ctx, &user); err != nil {
-		log.Error(err, "unable to update SqlUser status")
-		return ctrl.Result{}, err
-	}
 	count, err := driver.UpsertUser(ctx, user)
 	if err != nil {
 		log.Error(err, "failed to create SqlUser")
@@ -162,6 +177,18 @@ func (r *SqlUserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if count > 0 {
 		r.Recorder.Event(&user, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
 		sqlOperatorQueries.With(promLabels).Add(float64(count))
+
+		if !user.Status.Created {
+			user.Status.Created = true
+			user.Status.CreationTimestamp = &metav1.Time{Time: time.Now()}
+		}
+		user.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
+		user.Status.OwnerID = driver.GetOwnerID()
+
+		if err := r.Status().Update(ctx, &user); err != nil {
+			log.Error(err, "unable to update SqlUser status")
+			return ctrl.Result{}, err
+		}
 	}
 
 	return scheduledResult, nil

@@ -1,5 +1,7 @@
 package v1alpha1
 
+type OwnerID string
+
 type SqlCredentials struct {
 	// Username for the sql user
 	Username string `json:"username,omitempty"`
