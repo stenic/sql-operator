@@ -30,6 +30,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	steniciov1alpha1 "github.com/stenic/sql-operator/api/v1alpha1"
+	"github.com/stenic/sql-operator/drivers"
 )
 
 // SqlHostReconciler reconciles a SqlHost object
@@ -65,6 +66,16 @@ func (r *SqlHostReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	if err := r.Get(ctx, req.NamespacedName, &host); err != nil {
 		// log.Error(err, "unable to fetch SqlDatabase")
 		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	driver, err := drivers.GetDriver(host)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if err := driver.InitOwnerSchema(ctx); err != nil {
+		r.Recorder.Event(&host, "Warning", "Error", err.Error())
+		return ctrl.Result{RequeueAfter: r.RefreshRate * 10}, err
 	}
 
 	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}

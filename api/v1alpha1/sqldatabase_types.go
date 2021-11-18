@@ -46,6 +46,9 @@ type SqlDatabaseStatus struct {
 
 	// Timestamp when the user was last updated/checked.
 	LastModifiedTimestamp *metav1.Time `json:"lastModifiedTimestamp,omitempty"`
+
+	// String used to identify owership
+	OwnerID OwnerID `json:"ownerID,omitempty"`
 }
 
 //+kubebuilder:object:root=true

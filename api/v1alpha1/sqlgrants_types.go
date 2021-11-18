@@ -51,6 +51,9 @@ type SqlGrantStatus struct {
 	LastModifiedTimestamp *metav1.Time `json:"lastModifiedTimestamp,omitempty"`
 
 	CurrentGrants []string `json:"currentGrants,omitempty"`
+
+	// String used to identify owership
+	OwnerID OwnerID `json:"ownerID,omitempty"`
 }
 
 //+kubebuilder:object:root=true

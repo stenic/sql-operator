@@ -105,6 +105,18 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, err
 	}
 
+	// Provide ownership data
+	err = driver.SetOwnershipData(ctx, drivers.OwnerShipData{
+		Type:     drivers.OwnerShipTypeGrant,
+		Name:     grants.Name,
+		Resource: req.NamespacedName.String(),
+		OwnerID:  grants.Status.OwnerID,
+	})
+	if err != nil {
+		r.Recorder.Event(&host, "Warning", "Error", err.Error())
+		return ctrl.Result{RequeueAfter: r.RefreshRate * 2}, err
+	}
+
 	finalizerName := "stenic.io/sqlgrants-deletion"
 	// examine DeletionTimestamp to determine if object is under deletion
 	if grants.ObjectMeta.DeletionTimestamp.IsZero() {
@@ -122,14 +134,20 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		if controllerutil.ContainsFinalizer(&grants, finalizerName) {
 			// our finalizer is present, so lets handle any external dependency
 
-			if grants.Spec.CleanupPolicy == steniciov1alpha1.CleanupPolicyDelete {
-				// delete the user
-				if err = driver.DeleteGrants(ctx, grants, user, database); err != nil {
-					r.Recorder.Event(&grants, "Warning", "Error", err.Error())
-					sqlOperatorActionsFailures.With(promLabels).Inc()
-					return ctrl.Result{}, err
-				}
+			// Cleanup ref
+			if err := driver.DeleteOwnerState(ctx); err != nil {
+				log.Error(err, "unable to cleanup ownership")
+				return ctrl.Result{}, err
 			}
+			r.Recorder.Event(&grants, "Normal", "Delete", "Removed owner references")
+
+			// delete the grant
+			if err = driver.DeleteGrants(ctx, grants, user, database); err != nil {
+				r.Recorder.Event(&grants, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
+				return ctrl.Result{}, err
+			}
+			r.Recorder.Event(&grants, "Normal", "Delete", "Deleted mysql object")
 
 			// remove our finalizer from the list and update it.
 			controllerutil.RemoveFinalizer(&grants, finalizerName)
@@ -142,6 +160,11 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, nil
 	}
 
+	if driver.Noop {
+		r.Recorder.Event(&grants, "Normal", "Noop", "Determined object is not owned")
+		return ctrl.Result{}, nil
+	}
+
 	// Deduplicate control loop
 	if grants.Status.LastModifiedTimestamp != nil && time.Since(grants.Status.LastModifiedTimestamp.Time) < r.RefreshRate {
 		return ctrl.Result{}, nil
@@ -150,12 +173,6 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if grants.Status.CurrentGrants == nil {
 		grants.Status.CurrentGrants = []string{}
 	}
-
-	if !grants.Status.Created {
-		grants.Status.Created = true
-		grants.Status.CreationTimestamp = &metav1.Time{Time: time.Now()}
-	}
-	grants.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
 
 	if err := r.Status().Update(ctx, &grants); err != nil {
 		log.Error(err, "unable to update SqlGrant status")
@@ -172,12 +189,18 @@ func (r *SqlGrantReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if count > 0 {
 		r.Recorder.Event(&grants, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
 		sqlOperatorQueries.With(promLabels).Add(float64(count))
-	}
 
-	grants.Status.CurrentGrants = grants.Spec.Grants
-	if err := r.Status().Update(ctx, &grants); err != nil {
-		log.Error(err, "unable to update SqlGrant status")
-		return ctrl.Result{}, err
+		if !grants.Status.Created {
+			grants.Status.Created = true
+			grants.Status.CreationTimestamp = &metav1.Time{Time: time.Now()}
+		}
+		grants.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
+		grants.Status.CurrentGrants = grants.Spec.Grants
+
+		if err := r.Status().Update(ctx, &grants); err != nil {
+			log.Error(err, "unable to update SqlGrant status")
+			return ctrl.Result{}, err
+		}
 	}
 
 	return scheduledResult, nil

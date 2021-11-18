@@ -85,6 +85,18 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
+	// Provide ownership data
+	err = driver.SetOwnershipData(ctx, drivers.OwnerShipData{
+		Type:     drivers.OwnerShipTypeDatabase,
+		Name:     database.Spec.DatabaseName,
+		Resource: req.NamespacedName.String(),
+		OwnerID:  database.Status.OwnerID,
+	})
+	if err != nil {
+		r.Recorder.Event(&host, "Warning", "Error", err.Error())
+		return ctrl.Result{RequeueAfter: r.RefreshRate * 2}, err
+	}
+
 	scheduledResult := ctrl.Result{RequeueAfter: r.RefreshRate}
 
 	finalizerName := "stenic.io/sqldatabase-deletion"
@@ -113,7 +125,7 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 			if len(children.Items) > 0 {
 				err := fmt.Errorf(
 					"%s - [%s/%s] ...",
-					"Can't delete, found other referencing this object",
+					"can't delete, found other referencing this object",
 					children.Items[0].Namespace,
 					children.Items[0].Name,
 				)
@@ -122,15 +134,22 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 				// might have been faster than referenced object, reschedule.
 				return scheduledResult, err
 			}
+			r.Recorder.Event(&database, "Normal", "Delete", "Validated no child objects")
 
-			if database.Spec.CleanupPolicy == steniciov1alpha1.CleanupPolicyDelete {
-				// delete the user
-				if err = driver.DeleteDatabase(ctx, database); err != nil {
-					r.Recorder.Event(&database, "Warning", "Error", err.Error())
-					sqlOperatorActionsFailures.With(promLabels).Inc()
-					return ctrl.Result{}, err
-				}
+			// Cleanup ref
+			if err := driver.DeleteOwnerState(ctx); err != nil {
+				log.Error(err, "unable to cleanup ownership")
+				return ctrl.Result{}, err
 			}
+			r.Recorder.Event(&database, "Normal", "Delete", "Removed owner references")
+
+			// delete the user
+			if err = driver.DeleteDatabase(ctx, database); err != nil {
+				r.Recorder.Event(&database, "Warning", "Error", err.Error())
+				sqlOperatorActionsFailures.With(promLabels).Inc()
+				return ctrl.Result{}, err
+			}
+			r.Recorder.Event(&database, "Normal", "Delete", "Deleted mysql object")
 
 			// remove our finalizer from the list and update it.
 			controllerutil.RemoveFinalizer(&database, finalizerName)
@@ -143,20 +162,14 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
-	// Deduplicate control loop
-	if database.Status.LastModifiedTimestamp != nil && time.Since(database.Status.LastModifiedTimestamp.Time) < r.RefreshRate {
+	if driver.Noop {
+		r.Recorder.Event(&database, "Normal", "Noop", "Determined object is not owned")
 		return ctrl.Result{}, nil
 	}
 
-	if !database.Status.Created {
-		database.Status.Created = true
-		database.Status.CreationTimestamp = &metav1.Time{Time: time.Now()}
-	}
-	database.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
-
-	if err := r.Status().Update(ctx, &database); err != nil {
-		log.Error(err, "unable to update SqlDatabase status")
-		return ctrl.Result{}, err
+	// Deduplicate control loop
+	if database.Status.LastModifiedTimestamp != nil && time.Since(database.Status.LastModifiedTimestamp.Time) < r.RefreshRate {
+		return ctrl.Result{}, nil
 	}
 
 	count, err := driver.UpsertDatabase(ctx, database)
@@ -169,6 +182,18 @@ func (r *SqlDatabaseReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	if count > 0 {
 		r.Recorder.Event(&database, "Normal", "Changed", fmt.Sprintf("%d queries executed", count))
 		sqlOperatorQueries.With(promLabels).Add(float64(count))
+
+		if !database.Status.Created {
+			database.Status.Created = true
+			database.Status.CreationTimestamp = &metav1.Time{Time: time.Now()}
+		}
+		database.Status.LastModifiedTimestamp = &metav1.Time{Time: time.Now()}
+		database.Status.OwnerID = driver.GetOwnerID()
+
+		if err := r.Status().Update(ctx, &database); err != nil {
+			log.Error(err, "unable to update SqlDatabase status")
+			return ctrl.Result{}, err
+		}
 	}
 
 	return scheduledResult, nil

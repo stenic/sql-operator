@@ -77,6 +77,9 @@ spec:
                 description: Timestamp when the user was last updated/checked.
                 format: date-time
                 type: string
+              ownerID:
+                description: String used to identify owership
+                type: string
             required:
             - created
             type: object
