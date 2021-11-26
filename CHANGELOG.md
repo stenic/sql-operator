@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/stenic/sql-operator/compare/v1.12.1...v1.13.0) (2021-11-26)
+
+
+### Bug Fixes
+
+* **deps:** update module k8s.io/client-go to v0.22.4 ([81c10e7](https://github.com/stenic/sql-operator/commit/81c10e73b43dceee75d4ae18706ee9991ef553f8))
+
+
+### Features
+
+* Add owner tracking ([0f1afd2](https://github.com/stenic/sql-operator/commit/0f1afd2d845c16b2b61a68c945a308d4e593b355)), closes [#4](https://github.com/stenic/sql-operator/issues/4)
+
 ## [1.12.1](https://github.com/stenic/sql-operator/compare/v1.12.0...v1.12.1) (2021-11-15)
 
 
