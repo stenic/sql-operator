@@ -293,7 +293,7 @@ func (d *MySqlDriver) GetOwnerState(ctx context.Context, data OwnerShipData) (Ow
 			}
 		}
 	case OwnerShipTypeUser:
-		sqlStatement := fmt.Sprintf("SELECT count(u.id) FROM %s s WHERE resource=? LIMIT 1;", d.getOwnerDBTable(data))
+		sqlStatement := fmt.Sprintf("SELECT count(s.id) FROM %s s WHERE resource=? LIMIT 1;", d.getOwnerDBTable(data))
 		var matchCount int
 		row := db.QueryRowContext(ctx, sqlStatement, data.Resource)
 		if err := row.Scan(&matchCount); err != nil {
