@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.1](https://github.com/stenic/sql-operator/compare/v1.13.0...v1.13.1) (2021-11-28)
+
+
+### Bug Fixes
+
+* **user:** Fix owner tracking ([0f3d513](https://github.com/stenic/sql-operator/commit/0f3d513ed493b633783dc591d11c005f71678377))
+
 # [1.13.0](https://github.com/stenic/sql-operator/compare/v1.12.1...v1.13.0) (2021-11-26)
 
 
