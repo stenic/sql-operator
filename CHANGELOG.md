@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.2](https://github.com/stenic/sql-operator/compare/v1.13.1...v1.13.2) (2022-10-15)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/onsi/gomega to v1.22.1 ([796bf32](https://github.com/stenic/sql-operator/commit/796bf32edbc2edf012d853bb925f144a0047c0c0))
+* **deps:** update module github.com/prometheus/client_golang to v1.13.0 ([240294d](https://github.com/stenic/sql-operator/commit/240294d9ef8c2b4bc53e4eebaa6ce5f61e467531))
+
 ## [1.13.1](https://github.com/stenic/sql-operator/compare/v1.13.0...v1.13.1) (2021-11-28)
 
 
