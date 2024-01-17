@@ -29,7 +29,7 @@ jobs:
       # Cleanup & Install dependencies
       - run: make clean
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ~/go/pkg/mod
