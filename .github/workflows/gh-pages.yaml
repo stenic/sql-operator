@@ -20,7 +20,7 @@ jobs:
       - run: pip install mkdocs==1.4.0 mkdocs_material==8.5.6
       - run: mkdocs build
 
-      - uses: peaceiris/actions-gh-pages@v3
+      - uses: peaceiris/actions-gh-pages@v4
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
